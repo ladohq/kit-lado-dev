@@ -56,9 +56,12 @@ Done when: the worker has the brief and you have noted its BASE SHA.
    brief's ACs, the branch, and the range `BASE..HEAD`.
 2. Pass all findings to the developer, with their count ("7 findings: 2 Critical, ...").
    Do not filter them; the developer verifies each and may push back with reasons.
-3. On re-review, give the reviewer the previous findings and ask for each to be marked
-   RESOLVED or STILL OPEN.
-4. If three fix rounds pass without the open findings going down, stop and take the
+3. On re-review, give the same reviewer the previous findings and ask for each to be marked
+   RESOLVED or STILL OPEN. Fix rounds go to the same developer; spawn new workers only for
+   new tasks.
+4. As soon as the reviewer's final verdict arrives (Yes or No), end the reviewer with
+   `finish_worker(name)`; it has no commits, so nothing is lost.
+5. If three fix rounds pass without the open findings going down, stop and take the
    question to the human.
 
 Done when: the reviewer's verdict is "Ready to merge: Yes", or "With fixes" and you have
@@ -70,8 +73,8 @@ checked those fixes are in.
    have the developer rebase and re-run checks.
 2. Merge, then run `make check` on the merged result yourself. Done when it is green and
    you have its output.
-3. End the worker with `finish_worker(name)`: it closes the worker's window and removes its
-   worktree and branch. It refuses while the branch is not merged into your current branch
+3. Right after the merge, end the developer with `finish_worker(name)`: it closes the
+   worker's window and removes its worktree and branch. It refuses while the branch is not merged into your current branch
    or the worktree has uncommitted changes; read the reason and fix that first. Use
    `discard=True` only for work you decided to throw away. Done when `list_agents` no longer
    shows the worker.
