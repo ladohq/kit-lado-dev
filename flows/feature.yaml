@@ -28,19 +28,22 @@ states:
   implement:
     agent: developer
     do: |
-      Implement the design from the note (on a second visit: fix the review findings in the
-      note) in the run's worktree, test-first, as your role describes. Run `make check`
-      after your last change and commit on the run's branch.
-      Done when every AC is covered by a test you saw fail and then pass, `make check` is
-      green and the work is committed. Report `done` with your status and a one-line result
-      in note_summary and your full report in note_body.
+      Implement the design from the note in the run's worktree, test-first, as your role
+      describes. On a later visit the note says what to fix: review findings, a conflict
+      with main (merge main into the run's branch and resolve it) or a red `make check`.
+      Run `make check` after your last change and commit on the run's branch.
+      Done when every AC about behaviour is covered by a test you saw fail and then pass,
+      `make check` is green and the work is committed. Report `done`: note_summary is your
+      status and a one-line result; note_body is your full report, and starts with every
+      AC, written out in full, with its status and the test or command that shows it.
     outcomes: {done: review}
   review:
     agent: reviewer
     max_visits: 3
     do: |
       Review the run's branch against main, read-only, as your role describes: the diff is
-      `git diff main...HEAD` in the run's worktree, the ACs are in the task and the note.
+      `git diff main...HEAD` in the run's worktree. The ACs, with the developer's status for
+      each, start the developer's report in the note; check each against the diff.
       On a second visit, mark each previous finding RESOLVED or STILL OPEN first.
       Done when every AC has a verdict and every finding its evidence. Report `approved`
       when the branch is ready to merge, otherwise `changes`; note_summary is the verdict
@@ -53,11 +56,16 @@ states:
   merge:
     agent: supervisor
     do: |
-      Merge the run's branch into main in your repo, then run `make check` on the result.
-      If the merge conflicts, do not resolve it yourself: tell the human, who moves the run
-      on with lado flow-set.
-      Done when the branch is merged and `make check` on main is green. Report `merged`;
-      LADO then ends the run, closes its workers and removes its worktree and branch.
-    outcomes: {merged: done}
+      Check the branch together with the current main before main moves:
+      1. In the run's worktree, `git merge main`. If it conflicts, `git merge --abort` and
+         report `conflict`, with the conflicting files in the note.
+      2. Run `make check` in the run's worktree. If it is red, report `red`, with the
+         failing output in the note.
+      3. In your repo, on main, `git merge --ff-only <the run's branch>`. If main moved in
+         the meantime and that fails, start again at 1.
+      Done when main is at the run's branch and `make check` on it is green. Report
+      `merged`; LADO then ends the run, closes its workers and removes its worktree and
+      branch.
+    outcomes: {merged: done, conflict: implement, red: implement}
   done:
     end: true
