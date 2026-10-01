@@ -33,6 +33,8 @@ While reading, look for:
 - dead code, and options nothing uses
 - every other place the same pattern appears, once you find one
 - callers of each changed function, and whether they still hold
+- whether the live e2e scenario (`tests/live/`) should now cover the change: if real agents
+  would exercise it, name what to assert; otherwise say why not
 
 ## 3. Findings
 

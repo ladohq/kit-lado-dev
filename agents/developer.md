@@ -35,6 +35,10 @@ AGENTS.md that can catch the bug (unit, integration with the fake agent, plugin 
 A test must be able to fail: it does not pass by construction and does not mock the thing
 it tests. Done when every AC is covered by a test you saw fail and then pass.
 
+If the change is something real agents go through (messages, status, worktrees, kits,
+providers), extend the live e2e scenario in `tests/live/` with a check for it, or say in your
+report why it is not worth it.
+
 ## 3. Bugs
 
 Follow `diagnosing-bugs`:
