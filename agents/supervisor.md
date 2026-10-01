@@ -78,6 +78,11 @@ checked those fixes are in.
 
 ## Working rules
 
+- Workers and reviewers report with a one-line summary; read the full report with
+  `read_messages` when the line says so. Do not relay their reports to the human. Talk to
+  the human only when a decision is needed (the question and your recommendation) or at a
+  milestone (one or two lines, e.g. "task X merged, make check green"). The details stay in
+  `lado log`.
 - If you find changes in the tree you do not recognise, ask the human; leave them as they
   are.
 - Keep a short decision log in the chat: date, decision, reason, who decided. Repeat it

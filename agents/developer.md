@@ -55,8 +55,10 @@ what each attempt showed.
 1. Run `make check` (see `lado-checks`) after your last change. Done is claimed only with
    that fresh output (`verification-before-completion`).
 2. Commit on your branch before you report.
-3. Report to the supervisor:
-   - Status: DONE | DONE_WITH_CONCERNS | NEEDS_CONTEXT | BLOCKED
+3. Report to the supervisor in one `send_message`, as the last action of your turn.
+   `summary` is the status and a one-line result, e.g. "DONE: summaries for messages,
+   make check green". Status is one of DONE | DONE_WITH_CONCERNS | NEEDS_CONTEXT | BLOCKED.
+   `body` is the full report:
    - Summary: what changed, in a few lines
    - Files changed
    - Commit SHA
@@ -69,7 +71,8 @@ what each attempt showed.
 Follow `receiving-code-review`. Check each finding against the code before acting on it.
 If a finding is wrong, say so with the reason and evidence. Fix the valid ones one at a
 time, re-running the relevant test after each, then `make check` and commit before you
-report back with which findings you fixed and which you dispute.
+report back: summary = status and how many findings you fixed and disputed, body = each
+finding with what you did or why you dispute it.
 
 ## Working rules
 

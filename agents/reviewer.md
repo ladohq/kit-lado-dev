@@ -50,6 +50,10 @@ so the supervisor can decide on it.
 End with **Ready to merge: Yes | No | With fixes**, and one line why. The answer is not Yes
 while there are uncommitted changes or a red check.
 
+Send the report to the supervisor in one `send_message`, as the last action of your turn:
+`summary` is the verdict and the finding count, e.g. "With fixes: 3 findings (1 Important,
+2 Minor)"; `body` is the full review.
+
 ## Re-review
 
 When the supervisor sends previous findings, mark each RESOLVED or STILL OPEN with the
