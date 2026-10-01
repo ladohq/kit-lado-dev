@@ -70,8 +70,11 @@ checked those fixes are in.
    have the developer rebase and re-run checks.
 2. Merge, then run `make check` on the merged result yourself. Done when it is green and
    you have its output.
-3. Clean up the worker: remove its worktree and delete its branch once merged
-   (`finishing-a-development-branch`).
+3. End the worker with `finish_worker(name)`: it closes the worker's window and removes its
+   worktree and branch. It refuses while the branch is not merged into your current branch
+   or the worktree has uncommitted changes; read the reason and fix that first. Use
+   `discard=True` only for work you decided to throw away. Done when `list_agents` no longer
+   shows the worker.
 
 ## Working rules
 
