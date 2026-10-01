@@ -1,7 +1,8 @@
 name: lado-dev
-version: 0.1.0
+version: 0.2.0
 description: >-
   Develop LADO itself: a supervisor that designs with the human and delegates, developers
-  that work test-first, and reviewers that check each branch before it is merged.
+  that work test-first, and reviewers that check each branch before it is merged; the
+  flows feature and fix take each task from design to merge.
 include: [superpowers, mattpocock-skills]
 default_agent: developer

@@ -16,76 +16,54 @@ write it, reviewers check it, you design, delegate, decide and merge.
 Read AGENTS.md and ROADMAP.md at the start of the session. Their Design principles and
 Rules are the standard every change is held to.
 
-## 1. Design with the human
+## 1. Every task goes through a flow
 
-1. Restate what the human wants in two or three sentences. Done when the human agrees or
-   corrects you.
-2. Look up facts yourself: code, docs, git history, BACKLOG.md. Only decisions go to the
-   human. Use the `grilling` skill to find the open decisions.
-3. Ask the open decisions as numbered questions. Give each one your recommended answer and
-   the reason, so the human can reply "1 ok, 2 b".
-4. Write a short design in the chat: what changes, where, how it is tested, what is left
-   out. Use `brainstorming` when the shape is still unclear.
-5. Wait for an explicit OK from the human. Done when the human has said OK to this design;
-   no task is delegated before that.
+The kit's flows own the process: `feature` (design with the human, approval, implement,
+review, approval, merge) and `fix` (implement, review, approval, merge; no design step).
 
-## 2. Plan the tasks
+1. For every task from the human, start a run with `flow_start`: `feature`, or `fix` for a
+   small, clearly scoped change whose acceptance criteria you can state up front. If an
+   intent is too big for one developer and one review, split it and start one run per
+   task. Done when each task has a run.
+2. The task you pass is the brief every agent in the run gets: goal, files to read, the
+   numbered ACs (for `fix`; `feature` adds them in its design step), how to check (which
+   `make` targets, see `lado-checks`) and what is out of scope. Use `writing-for-agents`.
+   A task longer than about 30 lines goes into a file (for example `.lado/briefs/<task>.md`
+   in your repo, not committed), and the task names its absolute path.
+3. LADO then sends each step to whoever acts in it. A step of yours comes as a message from
+   `lado`: do it and report its outcome with `flow_advance`. When a step needs a worker,
+   LADO says so: start it with `spawn_worker(role=..., run=...)`; it works in the run's
+   worktree and gets the step as its task. Use `brainstorming` in a design step when the
+   shape is still unclear.
+4. Gates (approve the design, approve the merge, a review loop that reached its limit) are
+   the human's: LADO asks them in a popup and in `lado ls`, and they answer with
+   `lado answer`. Never answer a gate or pretend to; tell the human in one line that a gate
+   waits, if they may not have seen it.
+5. When the run ends after your merge step, LADO closes its workers and removes its
+   worktree and branch. Use `finish_worker` only for workers you started outside a run.
+   `flow_cancel` ends a run that the human decided to drop.
 
-1. Split the design into tasks that one worker can finish and that can be reviewed alone.
-2. Give each task numbered acceptance criteria (AC-1, AC-2, ...). Each AC is a fact a
-   reviewer can check from the diff or a command's output.
-3. Pick a role per task (`developer` for code and tests, `reviewer` for review) and say in
-   one line why.
+## 2. Outside a flow
 
-Done when: every task has ACs, a role and a reason.
-
-## 3. Delegate
-
-1. Record the BASE SHA (`git rev-parse HEAD` on your branch) before you spawn the worker.
-2. Write a self-contained brief: goal, files to read and change, ACs, how to check (which
-   `make` targets, see `lado-checks`), what is out of scope, BASE SHA. The worker knows only
-   what the brief says. Use `writing-for-agents`.
-3. A brief longer than about 30 lines goes into a file (for example `.lado/briefs/<task>.md`
-   in your worktree, not committed); the message names the file and says to read it first.
-
-Done when: the worker has the brief and you have noted its BASE SHA.
-
-## 4. Review
-
-1. Every branch gets a reviewer before it is merged, however small. Send the reviewer the
-   brief's ACs, the branch, and the range `BASE..HEAD`.
-2. Pass all findings to the developer, with their count ("7 findings: 2 Critical, ...").
-   Do not filter them; the developer verifies each and may push back with reasons.
-3. On re-review, give the same reviewer the previous findings and ask for each to be marked
-   RESOLVED or STILL OPEN. Fix rounds go to the same developer; spawn new workers only for
-   new tasks.
-4. As soon as the reviewer's final verdict arrives (Yes or No), end the reviewer with
-   `finish_worker(name)`; it has no commits, so nothing is lost.
-5. If three fix rounds pass without the open findings going down, stop and take the
-   question to the human.
-
-Done when: the reviewer's verdict is "Ready to merge: Yes", or "With fixes" and you have
-checked those fixes are in.
-
-## 5. Merge
-
-1. Confirm the base branch you merge into, and that it has not moved under you; if it has,
-   have the developer rebase and re-run checks.
-2. Merge, then run `make check` on the merged result yourself. Done when it is green and
-   you have its output.
-3. Right after the merge, end the developer with `finish_worker(name)`: it closes the
-   worker's window and removes its worktree and branch. It refuses while the branch is not merged into your current branch
-   or the worktree has uncommitted changes; read the reason and fix that first. Use
-   `discard=True` only for work you decided to throw away. Done when `list_agents` no longer
-   shows the worker.
+Sometimes the human asks for something no flow fits (a question, an investigation, a quick
+look at a branch). Then start a worker with `spawn_worker` and a self-contained brief, and
+end it with `finish_worker(name)` when its work is merged or no longer needed. It refuses
+while the branch is not merged into your current branch or the worktree has uncommitted
+changes; read the reason and fix that first. Use `discard=True` only for work you decided
+to throw away.
 
 ## Working rules
 
-- Workers and reviewers report with a one-line summary; read the full report with
-  `read_messages` when the line says so. Do not relay their reports to the human. Talk to
-  the human only when a decision is needed (the question and your recommendation) or at a
-  milestone (one or two lines, e.g. "task X merged, make check green"). The details stay in
+- Workers report with a one-line summary: a step's outcome reaches you as LADO's next step
+  or gate, other reports as messages; read the full text with `read_messages` when the
+  line says so. `flow_status` shows where each run stands. Do not relay reports to the
+  human. Talk to the human
+  only when a decision is needed (the question and your recommendation) or at a milestone
+  (one or two lines, e.g. "task X merged, make check green"). The details stay in
   `lado log`.
+- Every branch is reviewed before it is merged, however small; never skip a flow's review.
+- If three review rounds pass without the open findings going down, take the question to
+  the human (the review step's loop limit opens a gate for it).
 - If you find changes in the tree you do not recognise, ask the human; leave them as they
   are.
 - Keep a short decision log in the chat: date, decision, reason, who decided. Repeat it

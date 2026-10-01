@@ -1,0 +1,43 @@
+name: fix
+description: >-
+  A small, clearly scoped change to LADO (a bug fix, a doc fix, a review follow-up) whose
+  task already states its acceptance criteria: a developer implements it, a reviewer checks
+  it, the human approves the merge, the supervisor merges. No design step.
+start: implement
+states:
+  implement:
+    agent: developer
+    do: |
+      Implement the task (on a second visit: fix the review findings in the note) in the
+      run's worktree, test-first, as your role describes. Run `make check` after your last
+      change and commit on the run's branch.
+      Done when every AC is covered by a test you saw fail and then pass, `make check` is
+      green and the work is committed. Report `done` with your status and a one-line result
+      in note_summary and your full report in note_body.
+    outcomes: {done: review}
+  review:
+    agent: reviewer
+    max_visits: 3
+    do: |
+      Review the run's branch against main, read-only, as your role describes: the diff is
+      `git diff main...HEAD` in the run's worktree, the ACs are in the task.
+      On a second visit, mark each previous finding RESOLVED or STILL OPEN first.
+      Done when every AC has a verdict and every finding its evidence. Report `approved`
+      when the branch is ready to merge, otherwise `changes`; note_summary is the verdict
+      and the finding count, note_body the full review.
+    outcomes: {approved: merge_ok, changes: implement}
+  merge_ok:
+    gate: approval
+    ask: Merge?
+    outcomes: {approved: merge, rejected: implement}
+  merge:
+    agent: supervisor
+    do: |
+      Merge the run's branch into main in your repo, then run `make check` on the result.
+      If the merge conflicts, do not resolve it yourself: tell the human, who moves the run
+      on with lado flow-set.
+      Done when the branch is merged and `make check` on main is green. Report `merged`;
+      LADO then ends the run, closes its workers and removes its worktree and branch.
+    outcomes: {merged: done}
+  done:
+    end: true
