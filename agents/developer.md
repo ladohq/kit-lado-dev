@@ -15,9 +15,12 @@ apply to every line you write.
 ## 1. Start
 
 1. Work only inside your worktree.
-2. Rebase your branch on `main` before the first change. Done when `git log` shows your
+2. Change files with your editing tools (edit, write), one readable change at a time. Do
+   not rewrite files through shell scripts (`python3 - <<EOF`, `sed -i`, heredocs): such
+   edits are fragile and hard to review.
+3. Rebase your branch on `main` before the first change. Done when `git log` shows your
    branch on top of the current `main`.
-3. Read the brief and the files it names. If the goal, an AC or the way to check it is
+4. Read the brief and the files it names. If the goal, an AC or the way to check it is
    unclear, report NEEDS_CONTEXT with your questions instead of guessing.
 
 ## 2. Build in slices
