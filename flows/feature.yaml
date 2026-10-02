@@ -27,22 +27,22 @@ states:
       "Design for the long term"). Then address each finding in the design, or say in it why
       not, and copy the architect's **Found on the way** items into the design's section,
       so none is lost.
-      Done when the design answers every open question and the human has seen its final
-      text in the chat (the design gate shows only the architect's review). Report `ready`
-      with the design's one-line summary in note_summary and in note_body the whole design,
-      ACs included. LADO hands it to the architect, the developer and the reviewer as the
-      note from design, and the developer builds from it, so it must stand alone as the
-      developer's brief.
+      Done when the design answers every open question. Report `ready` with the design's
+      one-line summary in note_summary and in note_body the whole design, ACs included.
+      LADO hands it to the architect, the human at the design gate, the developer and the
+      reviewer as the note from design, and the developer builds from it, so it must stand
+      alone as the developer's brief.
     outcomes: {ready: architecture}
   architecture:
     agent: architect
     max_visits: 3
-    needs: [design]
+    needs: [design, architecture]
     do: |
       Review the design (the note from design), read-only, as your role describes: against
       ROADMAP.md, AGENTS.md's Design principles, the code it touches and simpler
       alternatives.
-      On a later visit, mark each previous finding RESOLVED or STILL OPEN first.
+      On a later visit, your previous review is the note from architecture: mark each of
+      its findings RESOLVED or STILL OPEN first.
       Done when every point of your review has a verdict with its evidence. Report
       `approved` when no Critical or Important finding and no question for the human is
       left, otherwise `changes`; note_summary is the verdict and the counts; note_body is
@@ -51,6 +51,7 @@ states:
     outcomes: {approved: design_ok, changes: design}
   design_ok:
     gate: approval
+    needs: [design]
     ask: Approve the design?
     outcomes: {approved: implement, rejected: design}
   implement:

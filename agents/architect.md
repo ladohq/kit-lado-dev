@@ -65,6 +65,7 @@ your review only: the findings, **Questions for the human** and **Found on the w
 copy the design into it: LADO gives the design to the steps that need it.
 Outside a run, send the review to the supervisor with `send_message`.
 
-On a later visit, mark each previous finding RESOLVED or STILL OPEN with the evidence
-first, then review what changed. Your earlier **Found on the way** items should now be in
+On a later visit, the step also carries your previous review as the note from
+architecture. Mark each of its findings RESOLVED or STILL OPEN with the evidence first, then
+review what changed. Your earlier **Found on the way** items should now be in
 the design's own section; list again any that are missing.
