@@ -22,13 +22,16 @@ states:
   review:
     agent: reviewer
     max_visits: 3
+    needs: [review]
     do: |
       Review the run's branch against main, read-only, as your role describes: the diff is
       `git diff main...HEAD` in the run's worktree. The ACs are in the task; the developer's
-      report in the note starts with its status for each. Check each against the diff.
+      report in the previous step's note starts with its status for each. Check each
+      against the diff.
       Review the Architecture axis too, and list what is outside the change under
       **Found on the way**.
-      On a second visit, mark each previous finding RESOLVED or STILL OPEN first.
+      On a later visit, your previous review is the note from review: mark each of its
+      findings RESOLVED or STILL OPEN first.
       Done when every AC has a verdict and every finding its evidence. Report `approved`
       when the branch is ready to merge, otherwise `changes`; note_summary is the verdict
       and the finding count, note_body the full review.

@@ -7,6 +7,7 @@ start: design
 states:
   design:
     agent: supervisor
+    needs: [design]
     do: |
       Design the change with the human, in the chat, for the long term (your role, section
       "Design for the long term").
@@ -22,11 +23,12 @@ states:
          a fact a reviewer can check from the diff or a command's output. Bugs and debt
          you found outside the task go in its last section, **Found on the way**
          (`lado-checks`): the developer records them.
-      On a later visit the note holds the architect's findings or the human's answer. First
-      ask the architect's "Questions for the human" in the chat (your role, section
-      "Design for the long term"). Then address each finding in the design, or say in it why
-      not, and copy the architect's **Found on the way** items into the design's section,
-      so none is lost.
+      On a later visit your previous design is the note from design (on the first visit
+      there is no note yet): revise that text, not one from memory. The previous step's
+      note holds the architect's findings or the human's answer. First ask the architect's
+      "Questions for the human" in the chat (your role, section "Design for the long
+      term"). Then address each finding in the design, or say in it why not, and copy the
+      architect's **Found on the way** items into the design's section, so none is lost.
       Done when the design answers every open question. Report `ready` with the design's
       one-line summary in note_summary and in note_body the whole design, ACs included.
       LADO hands it to the architect, the human at the design gate, the developer and the
@@ -76,7 +78,7 @@ states:
   review:
     agent: reviewer
     max_visits: 3
-    needs: [design]
+    needs: [design, review]
     do: |
       Review the run's branch against main, read-only, as your role describes: the diff is
       `git diff main...HEAD` in the run's worktree. The ACs are those of the approved design
@@ -85,7 +87,8 @@ states:
       ones the report lists.
       Review the Architecture axis too, and list what is outside the change under
       **Found on the way**.
-      On a second visit, mark each previous finding RESOLVED or STILL OPEN first.
+      On a later visit, your previous review is the note from review: mark each of its
+      findings RESOLVED or STILL OPEN first.
       Done when every AC has a verdict and every finding its evidence. Report `approved`
       when the branch is ready to merge, otherwise `changes`; note_summary is the verdict
       and the finding count, note_body the full review.

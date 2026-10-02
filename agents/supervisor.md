@@ -65,9 +65,9 @@ The design you report is the developer's brief: LADO hands it on as it is to the
 the human at the design gate, the developer and the reviewer, so it stands alone (no "see
 the chat"). The architect's review comes back without it. When the review has **Questions
 for the human**, ask them in the chat before you revise the design, in the `grilling`
-format: one round of numbered questions, each with the context in a line and the
-recommended answer (the architect's, or yours if you disagree, with why). Then write the
-human's answers into the design.
+format (numbered questions in rounds, each with its context and your recommended answer:
+the architect's, or yours if you disagree, with why). Then write the human's answers into
+the design.
 
 ## 3. Outside a flow
 
