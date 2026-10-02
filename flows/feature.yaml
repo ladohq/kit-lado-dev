@@ -1,26 +1,44 @@
 name: feature
 description: >-
-  A change to LADO from the human's intent to a merged branch: design with the human, the
-  human approves it, a developer implements it test-first, a reviewer checks it, the human
-  approves the merge, the supervisor merges.
+  A change to LADO from the human's intent to a merged branch: design with the human, an
+  architect reviews the design, the human approves it, a developer implements it
+  test-first, a reviewer checks it, the human approves the merge, the supervisor merges.
 start: design
 states:
   design:
     agent: supervisor
     do: |
-      Design the change with the human, in the chat.
+      Design the change with the human, in the chat, for the long term (your role, section
+      "Design for the long term").
       1. Restate what the human wants in two or three sentences. Done when the human agrees
          or corrects you.
-      2. Look up facts yourself (code, docs, git history, BACKLOG.md). Use `grilling` to
-         find the decisions that are the human's, and ask them as numbered questions, each
-         with your recommended answer and why.
-      3. Write a short design: what changes, where, how it is tested, what is left out, and
-         numbered acceptance criteria (AC-1, AC-2, ...), each a fact a reviewer can check
-         from the diff or a command's output.
+      2. Look up facts yourself (code, docs, git history, BACKLOG.md). For a bug, find its
+         root cause first. Use `grilling` to find the decisions that are the human's, and
+         ask them as numbered questions, each with your recommended answer and why.
+      3. Write a short design: the root cause (for a fix), 2-3 options with their trade-offs
+         and long-term cost and the one you recommend, how it fits the coming ROADMAP
+         stages and AGENTS.md's Design principles, what changes and where, how it is
+         tested, what is left out, and numbered acceptance criteria (AC-1, AC-2, ...), each
+         a fact a reviewer can check from the diff or a command's output.
+      On a later visit the note holds the architect's findings or the human's answer:
+      address each one in the design, or say in it why not.
       Done when the design answers every open question. Report `ready` with the design's
       one-line summary in note_summary and the whole design, ACs included, in note_body:
-      the developer gets it as its brief, so it must stand alone.
-    outcomes: {ready: design_ok}
+      the architect reviews it and the developer gets it as its brief, so it must stand
+      alone.
+    outcomes: {ready: architecture}
+  architecture:
+    agent: architect
+    max_visits: 3
+    do: |
+      Review the design in the note, read-only, as your role describes: against ROADMAP.md,
+      AGENTS.md's Design principles, the code it touches and simpler alternatives.
+      On a later visit, mark each previous finding RESOLVED or STILL OPEN first.
+      Done when every point of your review has a verdict with its evidence. Report
+      `approved` when no Critical or Important finding is left, otherwise `changes`;
+      note_summary is the verdict and the finding count; note_body is your review followed
+      by `## Design` and the whole design, unchanged.
+    outcomes: {approved: design_ok, changes: design}
   design_ok:
     gate: approval
     ask: Approve the design?
@@ -28,9 +46,13 @@ states:
   implement:
     agent: developer
     do: |
-      Implement the design from the note in the run's worktree, test-first, as your role
-      describes. On a later visit the note says what to fix: review findings, a conflict
-      with main (merge main into the run's branch and resolve it) or a red `make check`.
+      Implement the design in the run's worktree, test-first, as your role describes. The
+      design is under `## Design` in the architect's review in the note; the review's
+      Minor findings and **Found on the way** items come with it. On a later visit the note
+      says what to fix: review findings, a conflict with main (merge main into the run's
+      branch and resolve it) or a red `make check`.
+      Add a BACKLOG.md entry for each **Found on the way** item in the note and for what
+      you find yourself outside the task (`lado-checks`).
       Run `make check` after your last change and commit on the run's branch.
       Done when every AC about behaviour is covered by a test you saw fail and then pass,
       `make check` is green and the work is committed. Report `done`: note_summary is your
@@ -44,6 +66,8 @@ states:
       Review the run's branch against main, read-only, as your role describes: the diff is
       `git diff main...HEAD` in the run's worktree. The ACs, with the developer's status for
       each, start the developer's report in the note; check each against the diff.
+      Review the Architecture axis too, and list what is outside the change under
+      **Found on the way**.
       On a second visit, mark each previous finding RESOLVED or STILL OPEN first.
       Done when every AC has a verdict and every finding its evidence. Report `approved`
       when the branch is ready to merge, otherwise `changes`; note_summary is the verdict
@@ -56,14 +80,18 @@ states:
   merge:
     agent: supervisor
     do: |
-      Check the branch together with the current main before main moves:
-      1. In the run's worktree, `git merge main`. If it conflicts, `git merge --abort` and
+      Record what the review found on the way, then check the branch together with the
+      current main before main moves:
+      1. For each **Found on the way** item in the review in the note, add a BACKLOG.md
+         entry (`lado-checks`) in the run's worktree and commit it on the run's branch.
+      2. In the run's worktree, `git merge main`. If it conflicts, `git merge --abort` and
          report `conflict`, with the conflicting files in the note.
-      2. Run `make check` in the run's worktree. If it is red, report `red`, with the
+      3. Run `make check` in the run's worktree. If it is red, report `red`, with the
          failing output in the note.
-      3. In your repo, on main, `git merge --ff-only <the run's branch>`. If main moved in
-         the meantime and that fails, start again at 1.
-      Done when main is at the run's branch and `make check` on it is green. Report
+      4. In your repo, on main, `git merge --ff-only <the run's branch>`. If main moved in
+         the meantime and that fails, start again at 2.
+      Done when each item found on the way has its entry, main is at the run's branch and
+      `make check` on it is green. Report
       `merged`; LADO then ends the run, closes its workers and removes its worktree and
       branch.
     outcomes: {merged: done, conflict: implement, red: implement}

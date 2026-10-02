@@ -1,6 +1,6 @@
 ---
 name: lado-checks
-description: Which LADO check proves which claim, how to read a failure, and how to record a bug or friction in BACKLOG.md. Use before saying work on the LADO repo is done, when a check fails, or when you hit a LADO bug.
+description: Which LADO check proves which claim, how to read a failure, and how to record a bug, friction or debt in BACKLOG.md and who records it. Use before saying work on the LADO repo is done, when a check fails, or when you find a LADO bug or debt.
 ---
 
 # LADO checks
@@ -39,10 +39,13 @@ the `N passed` line).
 Done when: the failure has a class, a quoted line and, for code or test, a fix with the
 check green again.
 
-## Recording a bug or friction in BACKLOG.md
+## Recording a bug, friction or debt in BACKLOG.md
 
-When LADO itself gets in your way (a bug, a missing option, a confusing message), add a
-section to `BACKLOG.md` instead of working around it silently:
+Record what you find outside your task instead of fixing it silently or working around it:
+a bug, a friction (a missing option, a confusing message), or debt (a design that a coming
+ROADMAP stage will have to undo, a patch over a root cause, a second source of truth).
+`BACKLOG.md` is the place until the task tracker is connected (ROADMAP stage 6); then the
+same entry goes to the tracker. Add a section:
 
 ```markdown
 ## <short title: what is wrong>
@@ -52,7 +55,17 @@ Wanted: <what should happen instead.>
 Found: <YYYY-MM-DD>, <context: task or check where it showed up>.
 ```
 
-Keep it to a few lines. Mention the new entry in your report.
+Keep it to a few lines; check first that no entry covers it already. Mention the new entry
+in your report.
+
+Who writes the entry: whoever can write. In a flow run the read-only roles (architect,
+reviewer) list what they found under **Found on the way** in their note, each item as
+title, what happens, what is wanted. The next agent that writes on the run's branch adds
+those entries there: the developer in `implement`, the supervisor in `merge` for the
+review that approved the branch. Outside a run, the supervisor adds them on main.
+
+Done when: each item found has a BACKLOG.md entry, committed on the run's branch or on
+main, and the report names it.
 
 ## Clean-room
 

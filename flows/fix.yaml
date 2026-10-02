@@ -11,6 +11,8 @@ states:
       Implement the task in the run's worktree, test-first, as your role describes. On a
       later visit the note says what to fix: review findings, a conflict with main (merge
       main into the run's branch and resolve it) or a red `make check`.
+      Add a BACKLOG.md entry for each **Found on the way** item in the note and for what
+      you find yourself outside the task (`lado-checks`).
       Run `make check` after your last change and commit on the run's branch.
       Done when every AC about behaviour is covered by a test you saw fail and then pass,
       `make check` is green and the work is committed. Report `done`: note_summary is your
@@ -24,6 +26,8 @@ states:
       Review the run's branch against main, read-only, as your role describes: the diff is
       `git diff main...HEAD` in the run's worktree. The ACs are in the task; the developer's
       report in the note starts with its status for each. Check each against the diff.
+      Review the Architecture axis too, and list what is outside the change under
+      **Found on the way**.
       On a second visit, mark each previous finding RESOLVED or STILL OPEN first.
       Done when every AC has a verdict and every finding its evidence. Report `approved`
       when the branch is ready to merge, otherwise `changes`; note_summary is the verdict
@@ -36,14 +40,18 @@ states:
   merge:
     agent: supervisor
     do: |
-      Check the branch together with the current main before main moves:
-      1. In the run's worktree, `git merge main`. If it conflicts, `git merge --abort` and
+      Record what the review found on the way, then check the branch together with the
+      current main before main moves:
+      1. For each **Found on the way** item in the review in the note, add a BACKLOG.md
+         entry (`lado-checks`) in the run's worktree and commit it on the run's branch.
+      2. In the run's worktree, `git merge main`. If it conflicts, `git merge --abort` and
          report `conflict`, with the conflicting files in the note.
-      2. Run `make check` in the run's worktree. If it is red, report `red`, with the
+      3. Run `make check` in the run's worktree. If it is red, report `red`, with the
          failing output in the note.
-      3. In your repo, on main, `git merge --ff-only <the run's branch>`. If main moved in
-         the meantime and that fails, start again at 1.
-      Done when main is at the run's branch and `make check` on it is green. Report
+      4. In your repo, on main, `git merge --ff-only <the run's branch>`. If main moved in
+         the meantime and that fails, start again at 2.
+      Done when each item found on the way has its entry, main is at the run's branch and
+      `make check` on it is green. Report
       `merged`; LADO then ends the run, closes its workers and removes its worktree and
       branch.
     outcomes: {merged: done, conflict: implement, red: implement}

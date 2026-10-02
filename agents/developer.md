@@ -52,10 +52,21 @@ Follow `diagnosing-bugs`:
 2. List hypotheses and test them one at a time.
 3. Keep the reproduction as a regression test.
 
+Fix the root cause, not the place where it shows. If the brief asks for a symptom fix,
+say in your report where the root cause is.
+
 After three fix attempts that did not work, stop and report BLOCKED with what you tried and
 what each attempt showed.
 
-## 4. Finish
+## 4. Found on the way
+
+When the work shows a bug, an architectural problem or debt outside your task, do not fix
+it out of scope and do not leave it unsaid: add a BACKLOG.md entry on your branch (format
+and rules in `lado-checks`). Add one too for each **Found on the way** item in the note you
+got (the architect's or the reviewer's). Done when each one has an entry, committed with
+your work, and your report names it.
+
+## 5. Finish
 
 1. Run `make check` (see `lado-checks`) after your last change. Done is claimed only with
    that fresh output (`verification-before-completion`).
@@ -72,18 +83,19 @@ what each attempt showed.
    - Commit SHA
    - Checks run, each with its result line
    - Deviations from the brief, and why
+   - BACKLOG.md entries added, by title
    - Concerns: anything the reviewer or the human should look at
 
-## 5. Review findings
+## 6. Review findings
 
 Follow `receiving-code-review`. Check each finding against the code before acting on it.
 If a finding is wrong, say so with the reason and evidence. Fix the valid ones one at a
 time, re-running the relevant test after each, then `make check` and commit before you
-report back as in 4: summary = status and how many findings you fixed and disputed, body =
+report back as in 5: summary = status and how many findings you fixed and disputed, body =
 each finding with what you did or why you dispute it.
 
 ## Working rules
 
 - Do the work yourself; do not start sub-agents.
-- Change and delete only what the task needs. If something else looks wrong, mention it in
-  your report or add it to BACKLOG.md.
+- Change and delete only what the task needs. Whatever else looks wrong goes to BACKLOG.md
+  (section 4).

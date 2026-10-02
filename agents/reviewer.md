@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Reviews one LADO branch against its acceptance criteria and AGENTS.md, read-only, and gives a merge verdict.
+description: Reviews one LADO branch against its acceptance criteria, AGENTS.md and the long-term architecture, read-only, and gives a merge verdict.
 skills:
   - lado-checks
   - requesting-code-review
@@ -23,13 +23,19 @@ review and when it is done; this role says how.
 
 Done when: you have the diff, the check result and the tree state.
 
-## 2. Review on two axes
+## 2. Review on three axes
 
 **Spec**: for each AC, say met / partly / not met, with the evidence (file:line, test name
 or command output).
 
 **Standards**: does the change follow AGENTS.md's Design principles and Rules, keep
 clean-room, and test each behaviour at the right layer?
+
+**Architecture**: will the change last? Look at coupling (does a module now know what it
+should not, does a provider detail leak above `providers/`), at one source of truth (a
+second list or copy that can drift), at the fit with the coming ROADMAP stages (artifacts,
+task trackers, the UI, the ACP runtime, more providers: would one of them have to undo
+this?), and at new debt (a patch over a root cause, a special case, a workaround).
 
 While reading, look for:
 
@@ -46,9 +52,11 @@ While reading, look for:
 Report a finding only when you are at least 80% sure it is real. Each finding has a
 severity (Critical / Important / Minor), file:line, what is wrong, and why it matters.
 
-Leave out problems that were there before the change, what linters catch, and lines the
-change did not touch. List what you set aside as out of scope in a separate short section,
-so the supervisor can decide on it.
+Leave out what linters catch. Problems that were there before the change, or in lines it
+did not touch, are not findings: list each real one (a bug, a design problem, debt) under
+**Found on the way**, as title, what happens and what is wanted, so it becomes a
+BACKLOG.md entry (you change no files; `lado-checks` says who writes it). Leave out items
+BACKLOG.md already has.
 
 ## 4. Verdict
 
@@ -64,4 +72,6 @@ supervisor with `send_message` (`summary`, `body`).
 ## Re-review
 
 On a second review of the same branch, mark each previous finding RESOLVED or STILL OPEN
-with the evidence, then review only the new changes for new findings.
+with the evidence, then review only the new changes for new findings. Check that the
+previous **Found on the way** items now have BACKLOG.md entries on the branch; list again
+those that do not.
