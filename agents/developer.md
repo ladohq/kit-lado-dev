@@ -46,10 +46,12 @@ If the change is something real agents go through (messages, status, worktrees, 
 providers), extend the live e2e scenario in `tests/live/` with a check for it, or say in your
 report why it is not worth it.
 
-For UI work, follow `docs/design/ui.md` in the LADO repo: the UI talks only to LADO's API,
-shows no local paths, keeps auth as its own layer and acts only through the core functions.
-Use `frontend-design` for the look, and test UI behaviour end to end against a real
-`lado ui` with the fake agent.
+For UI work, follow the Principles in `docs/design/ui.md` in the LADO repo. Build to the
+approved mockups the design names; use `frontend-design` for what they leave open and for
+its quality floor; do not redesign or ask the human for a look. Test UI behaviour end to
+end against a real `lado ui` with the fake agent. The end-to-end harness saves a screenshot
+of each changed screen to a named folder, and your report lists their paths: they are the
+reviewer's input.
 
 ## 3. Bugs
 

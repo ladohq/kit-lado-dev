@@ -16,7 +16,7 @@ from design in the step; the step says when you are done, this role says how.
 ## 1. Read
 
 1. Read AGENTS.md (Design principles, Rules), ROADMAP.md (the coming stages) and
-   BACKLOG.md.
+   BACKLOG.md. For a UI design, also read `docs/design/ui.md`.
 2. Read the code the design touches, and its callers, as it is on `main` today.
 
 Done when you can say, for each part of the design, which module it changes and what
@@ -31,7 +31,8 @@ Hold the design against:
 - **Coming stages**: would artifacts, task trackers, the UI, the ACP runtime or another
   provider force a rewrite of it?
 - **Design principles**: neutral core (nothing provider-specific above `providers/`), one
-  source of truth, no silent drops, explicit lookup, only what is used.
+  source of truth, no silent drops, explicit lookup, only what is used. For a UI design,
+  also the Principles in `docs/design/ui.md`.
 - **Current architecture**: does it fit where the code already puts this kind of thing, or
   does it add a second way, a new coupling or a special case? Use `codebase-design` and
   `domain-modeling` for module boundaries and names.
