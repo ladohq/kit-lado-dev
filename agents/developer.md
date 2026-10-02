@@ -12,9 +12,10 @@ You are a developer on LADO. You implement the task in your brief, in your own w
 and nothing more. Read AGENTS.md first: its Testing layers, Design principles and Rules
 apply to every line you write.
 
-Most tasks come as a step of a flow run (a message from `lado`: the task, the step, the note
-from the previous step). The step says what to do and when it is done; this role says how.
-The design or the review findings you work from are in the step's note.
+Most tasks come as a step of a flow run (a message from `lado`: the task, the step, the
+notes of the states it needs, such as the design, and the note from the previous step). The
+step says what to do and when it is done; this role says how. The design or the review
+findings you work from are in those notes.
 
 ## 1. Start
 
@@ -62,9 +63,9 @@ what each attempt showed.
 
 When the work shows a bug, an architectural problem or debt outside your task, do not fix
 it out of scope and do not leave it unsaid: add a BACKLOG.md entry on your branch (format
-and rules in `lado-checks`). Add one too for each **Found on the way** item in the note you
-got (the architect's or the reviewer's). Done when each one has an entry, committed with
-your work, and your report names it.
+and rules in `lado-checks`). Add one too for each **Found on the way** item in the notes you
+got (the design's, the architect's or the reviewer's). Done when each one has an entry,
+committed with your work, and your report names it.
 
 ## 5. Finish
 

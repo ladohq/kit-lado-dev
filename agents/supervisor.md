@@ -61,6 +61,15 @@ A task is not done when its ACs pass but the next stage has to undo it. In every
 Done when the design names the root cause, the options with their cost and the recommended
 one, and says how it fits the coming stages. In `feature` the architect then reviews it.
 
+The design you report is the developer's brief: LADO hands it on as it is to the architect,
+the developer and the reviewer, so it stands alone (no "see the chat"). The architect's
+review comes back without it. When the review has **Questions for the human**, ask them in
+the chat before you revise the design, in the `grilling` format: one round of numbered
+questions, each with the context in a line and the recommended answer (the architect's, or
+yours if you disagree, with why). Then write the human's answers into the design. The
+design gate shows the human only the architect's review, so show the final design in the
+chat before you report `ready`.
+
 ## 3. Outside a flow
 
 Sometimes the human asks for something no flow fits (a question, an investigation, a quick

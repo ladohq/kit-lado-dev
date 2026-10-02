@@ -22,26 +22,32 @@ states:
          a fact a reviewer can check from the diff or a command's output. Bugs and debt
          you found outside the task go in its last section, **Found on the way**
          (`lado-checks`): the developer records them.
-      On a later visit the note holds the architect's findings or the human's answer:
-      address each one in the design, or say in it why not, and copy the architect's
-      **Found on the way** items into the design's section, so none is lost.
-      Done when the design answers every open question. Report `ready` with the design's
-      one-line summary in note_summary and in note_body the whole design, ACs included, as
-      one fenced block opened and closed with four backticks: the architect passes that
-      block on unchanged, the human approves it and the developer gets it as its brief, so
-      it must stand alone.
+      On a later visit the note holds the architect's findings or the human's answer. First
+      ask the architect's "Questions for the human" in the chat (your role, section
+      "Design for the long term"). Then address each finding in the design, or say in it why
+      not, and copy the architect's **Found on the way** items into the design's section,
+      so none is lost.
+      Done when the design answers every open question and the human has seen its final
+      text in the chat (the design gate shows only the architect's review). Report `ready`
+      with the design's one-line summary in note_summary and in note_body the whole design,
+      ACs included. LADO hands it to the architect, the developer and the reviewer as the
+      note from design, and the developer builds from it, so it must stand alone as the
+      developer's brief.
     outcomes: {ready: architecture}
   architecture:
     agent: architect
     max_visits: 3
+    needs: [design]
     do: |
-      Review the design in the note, read-only, as your role describes: against ROADMAP.md,
-      AGENTS.md's Design principles, the code it touches and simpler alternatives.
+      Review the design (the note from design), read-only, as your role describes: against
+      ROADMAP.md, AGENTS.md's Design principles, the code it touches and simpler
+      alternatives.
       On a later visit, mark each previous finding RESOLVED or STILL OPEN first.
       Done when every point of your review has a verdict with its evidence. Report
-      `approved` when no Critical or Important finding is left, otherwise `changes`;
-      note_summary is the verdict and the finding count; note_body is your review followed
-      by `## Design` and the design's fenced block from the note, copied byte for byte.
+      `approved` when no Critical or Important finding and no question for the human is
+      left, otherwise `changes`; note_summary is the verdict and the counts; note_body is
+      your review only, with the decisions that are the human's under "Questions for the
+      human" (LADO gives the next steps the design itself).
     outcomes: {approved: design_ok, changes: design}
   design_ok:
     gate: approval
@@ -49,14 +55,16 @@ states:
     outcomes: {approved: implement, rejected: design}
   implement:
     agent: developer
+    needs: [design]
     do: |
-      Implement the design in the run's worktree, test-first, as your role describes. The
-      design is the fenced block under `## Design` in the architect's review in the note.
-      The review's Minor findings are advice: apply one only if it changes no AC or
-      decision of the approved design, and list the ones you applied and skipped in your
-      report. On a later visit the note says what to fix: review findings, a conflict
-      with main (merge main into the run's branch and resolve it) or a red `make check`.
-      Add a BACKLOG.md entry for each **Found on the way** item in the note (the design's
+      Implement the design (the note from design, as the human approved it) in the run's
+      worktree, test-first, as your role describes. The architect's review comes with the
+      human's answer in the previous step's note on the first visit; its Minor findings are
+      advice: apply one only if it changes no AC or decision of the approved design, and
+      list the ones you applied and skipped in your report. On a later visit the previous
+      step's note says what to fix: review findings, a conflict with main (merge main into
+      the run's branch and resolve it) or a red `make check`.
+      Add a BACKLOG.md entry for each **Found on the way** item in the notes (the design's
       and the architect's) and for what you find yourself outside the task (`lado-checks`).
       Run `make check` after your last change and commit on the run's branch.
       Done when every AC about behaviour is covered by a test you saw fail and then pass,
@@ -67,10 +75,13 @@ states:
   review:
     agent: reviewer
     max_visits: 3
+    needs: [design]
     do: |
       Review the run's branch against main, read-only, as your role describes: the diff is
-      `git diff main...HEAD` in the run's worktree. The ACs, with the developer's status for
-      each, start the developer's report in the note; check each against the diff.
+      `git diff main...HEAD` in the run's worktree. The ACs are those of the approved design
+      (the note from design); the developer's report in the previous step's note starts
+      with its status for each. Check each AC of the design against the diff, not only the
+      ones the report lists.
       Review the Architecture axis too, and list what is outside the change under
       **Found on the way**.
       On a second visit, mark each previous finding RESOLVED or STILL OPEN first.

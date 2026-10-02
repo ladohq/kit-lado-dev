@@ -58,7 +58,7 @@ check green again.
 Record what you find outside your task instead of fixing it silently or working around it:
 a bug, a friction (a missing option, a confusing message), or debt (a design that a coming
 ROADMAP stage will have to undo, a patch over a root cause, a second source of truth).
-`BACKLOG.md` is the place until the task tracker is connected (ROADMAP stage 6); then the
+`BACKLOG.md` is the place until the task tracker is connected (ROADMAP stage 9); then the
 same entry goes to the tracker. Add a section:
 
 ```markdown
