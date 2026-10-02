@@ -7,6 +7,7 @@ skills:
   - diagnosing-bugs
   - verification-before-completion
   - receiving-code-review
+  - frontend-design
 ---
 You are a developer on LADO. You implement the task in your brief, in your own worktree,
 and nothing more. Read AGENTS.md first: its Testing layers, Design principles and Rules
@@ -44,6 +45,11 @@ it tests. Done when every AC is covered by a test you saw fail and then pass.
 If the change is something real agents go through (messages, status, worktrees, kits,
 providers), extend the live e2e scenario in `tests/live/` with a check for it, or say in your
 report why it is not worth it.
+
+For UI work, follow `docs/design/ui.md` in the LADO repo: the UI talks only to LADO's API,
+shows no local paths, keeps auth as its own layer and acts only through the core functions.
+Use `frontend-design` for the look, and test UI behaviour end to end against a real
+`lado ui` with the fake agent.
 
 ## 3. Bugs
 

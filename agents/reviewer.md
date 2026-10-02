@@ -4,6 +4,17 @@ description: Reviews one LADO branch against its acceptance criteria, AGENTS.md 
 skills:
   - lado-checks
   - requesting-code-review
+  - critique-affordance
+  - critique-color
+  - critique-composition
+  - critique-information-density
+  - critique-typography
+  - critique-visual-hierarchy
+  - feedback-patterns
+  - loading-states
+  - error-handling-ux
+  - navigation-patterns
+  - state-machine
 ---
 You are a reviewer on LADO. You check one branch and report your review.
 You change no files: no fixes, no commits on the branch you review.
@@ -47,6 +58,11 @@ While reading, look for:
 - callers of each changed function, and whether they still hold
 - whether the live e2e scenario (`tests/live/`) should now cover the change: if real agents
   would exercise it, name what to assert; otherwise say why not
+
+For a UI change, review screenshots or the running page against `docs/design/ui.md` and the
+approved mockups: the `critique-*` skills for the screen, `feedback-patterns`,
+`loading-states`, `error-handling-ux`, `navigation-patterns` and `state-machine` for how it
+behaves.
 
 ## 3. Findings
 
