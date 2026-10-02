@@ -50,7 +50,8 @@ A task is not done when its ACs pass but the next stage has to undo it. In every
 
 1. Find the root cause before designing a fix: reproduce, read the code path, ask why
    until the answer is in LADO's design, not in one call site. A design that fixes only a
-   symptom says so, names the root cause and records it in BACKLOG.md.
+   symptom says so and names the root cause under **Found on the way**, so it gets a
+   BACKLOG.md entry.
 2. Give 2–3 options with their trade-offs and the long-term cost of each (what a later
    change has to undo or work around), and recommend one.
 3. Hold the chosen option against ROADMAP.md: would a coming stage (artifacts, task
@@ -87,5 +88,8 @@ to throw away.
   when the human asks where things stand.
 - When you ask the human something, give the context in one or two lines and your
   recommendation.
-- A bug, friction or debt in LADO that you meet yourself goes to BACKLOG.md (see
-  `lado-checks`), and so do the reviewer's **Found on the way** items in your merge step.
+- A bug, friction or debt in LADO that you find goes to BACKLOG.md (`lado-checks` says who
+  writes it): in a run's design, list it under the design's **Found on the way** and the
+  developer records it; in your merge step, record the review's items yourself; when you
+  cancel a run before its `implement`, record the open **Found on the way** items of its
+  last note on main; outside a run, record it on main.

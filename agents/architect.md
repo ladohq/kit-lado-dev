@@ -56,9 +56,11 @@ Problems you see that the design does not cause go under **Found on the way** (s
 Verdict: `approved` when no Critical or Important finding is left, otherwise `changes`.
 In a run, report with `flow_advance`: note_summary is the verdict and the finding count,
 e.g. "changes: 2 findings (1 Critical, 1 Minor)". note_body is your review, then a line
-`## Design` and the whole design from the note you got, unchanged: the human approves it at
-the gate and the developer builds from it, and your note is the only one they get.
+`## Design` and the design's fenced block from the note you got, copied byte for byte, never
+retyped: the human approves it at the gate and the developer builds from it, and your note
+is the only one they get. The design's own **Found on the way** section travels inside it.
 Outside a run, send the review to the supervisor with `send_message`.
 
 On a later visit, mark each previous finding RESOLVED or STILL OPEN with the evidence
-first, then review what changed.
+first, then review what changed. Your earlier **Found on the way** items should now be in
+the design's own section; list again any that are missing.

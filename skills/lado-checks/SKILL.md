@@ -55,14 +55,17 @@ Wanted: <what should happen instead.>
 Found: <YYYY-MM-DD>, <context: task or check where it showed up>.
 ```
 
-Keep it to a few lines; check first that no entry covers it already. Mention the new entry
-in your report.
+Keep it to a few lines; check first that no entry covers it already. Add it at the end of
+the file: `.gitattributes` merges BACKLOG.md with `merge=union`, so entries that parallel
+branches append merge without a conflict. Mention the new entry in your report.
 
-Who writes the entry: whoever can write. In a flow run the read-only roles (architect,
-reviewer) list what they found under **Found on the way** in their note, each item as
-title, what happens, what is wanted. The next agent that writes on the run's branch adds
-those entries there: the developer in `implement`, the supervisor in `merge` for the
-review that approved the branch. Outside a run, the supervisor adds them on main.
+Who writes the entry: the next agent that writes on the run's branch. In a flow run the
+design and the read-only roles (architect, reviewer) list what they found under **Found on
+the way**, each item as title, what happens, what is wanted. The design carries its own and
+the architect's items to the developer, who adds the entries in `implement`, together with
+the reviewer's items of a `changes` review. The supervisor adds those of the review that
+approved the branch in `merge`, and those of a run it cancels before `implement` on main.
+Outside a run, the supervisor adds them on main.
 
 Done when: each item found has a BACKLOG.md entry, committed on the run's branch or on
 main, and the report names it.
