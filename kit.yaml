@@ -1,5 +1,5 @@
 name: lado-dev
-version: 0.3.0
+version: 0.3.1
 description: >-
   Develop LADO itself for the long term: a supervisor that designs with the human and
   delegates, an architect that reviews each design against the roadmap, developers that

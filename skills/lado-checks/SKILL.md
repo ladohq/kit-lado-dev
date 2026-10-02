@@ -22,6 +22,20 @@ yourself after your last change; quote it.
 Done when: the report names each command you ran and its last summary line (for pytest,
 the `N passed` line).
 
+## Run as little as proves the claim
+
+Checks are slow; run each one once, when it proves something new.
+
+- While working, run only the tests next to your change (`uv run pytest tests/test_x.py -k
+  name`); run the full `make check` once, after your last change, before you report.
+- A change only to docs (`*.md`, comments) or to a kit's prompts needs `make lint` only
+  (and `lado kits check` for a kit), not `make check`.
+- `make test-live` runs only when the change touches a provider, hooks, the MCP server or
+  how agents get their input, and only once per round. A reviewer does not run it again
+  when the developer's report shows it green on the reviewed commit; it reruns
+  `make check` only.
+- Never start a second long check while one runs; wait for its result.
+
 ## When a check fails
 
 1. Find the first real error and quote that exact line, not the summary.
