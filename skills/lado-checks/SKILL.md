@@ -17,7 +17,7 @@ yourself after your last change; quote it.
 | Behaviour across processes works (tmux, git, hooks, `lado mcp`, SQLite) | `make test-integration` | After touching `runtime.py`, `hooks.py`, `mcp_server.py`, `tmux.py`, `state.py` or a provider. Uses the fake agent, no LLM. |
 | The Kilo plugin works | `make test-js` | After touching `kilo_plugin.js` or its tests. |
 | The change is ready | `make check` | Always, last, before you report done. It runs all four above. |
-| A real agent CLI still works | `make test-live PROVIDER=claude` or `PROVIDER=kilo` | After changing a provider, and before a release. Ask the supervisor first for Claude: it uses a paid model. |
+| A real agent CLI still works | `make test-live PROVIDER=claude` or `PROVIDER=kilo` | After changing a provider, and on main before a release. Ask the supervisor first for Claude: it uses a paid model. |
 
 Done when: the report names each command you ran and its last summary line (for pytest,
 the `N passed` line).
@@ -34,6 +34,15 @@ Checks are slow; run each one once, when it proves something new.
   how agents get their input, and only once per round. A reviewer does not run it again
   when the developer's report shows it green on the reviewed commit; it reruns
   `make check` only.
+- A reviewer runs `make check` once per review, and on a re-review only when code changed
+  since the commit it last checked (not for docs or BACKLOG.md only).
+- The merge step runs `make check` only when `git merge main` brought new commits; when it
+  says "Already up to date", the reviewed commit is what lands.
+- A release runs no separate `make check`: main was checked at each merge and CI checks
+  the pushed commit. It needs `make test-live` on main and green CI on the release commit.
+- Never pipe a check whose result gates something (`make check | tail` hides a red exit
+  status): write it to a log (`make check > <log> 2>&1`), take the exit status, then read
+  the log's last lines.
 - Never start a second long check while one runs; wait for its result.
 
 ## When a check fails

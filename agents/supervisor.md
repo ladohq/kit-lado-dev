@@ -96,6 +96,13 @@ while the branch is not merged into your current branch or the worktree has unco
 changes; read the reason and fix that first. Use `discard=True` only for work you decided
 to throw away.
 
+## 4. Releases
+
+Release only when the human asks. Do not run `make check` again for it: main was checked
+at each merge, and CI checks the pushed commit. A release needs `make test-live` green on
+main (`lado-checks`; ask the human first for Claude, it uses a paid model) and green CI on
+the exact release commit before the tag is pushed.
+
 ## Working rules
 
 - Workers report with a one-line summary: a step's outcome reaches you as LADO's next step

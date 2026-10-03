@@ -106,12 +106,18 @@ states:
          entry (`lado-checks`) in the run's worktree and commit it on the run's branch.
       2. In the run's worktree, `git merge main`. If it conflicts, `git merge --abort` and
          report `conflict`, with the conflicting files in the note.
-      3. Run `make check` in the run's worktree. If it is red, report `red`, with the
-         failing output in the note.
+      3. If the merge said "Already up to date", main has not moved since the branch's
+         base: the reviewed commit (plus the BACKLOG.md entries of step 1) is what lands,
+         and the reviewer checked it. Do not run `make check` again; say so in the note.
+         Otherwise run `make check > <log file> 2>&1` in the run's worktree, with the log
+         outside the tree, and take its exit status; then show the log's last lines. Never
+         pipe `make check` (`| tail` hides a red exit status). If it is red, report `red`,
+         with the failing output in the note.
       4. In your repo, on main, `git merge --ff-only <the run's branch>`. If main moved in
          the meantime and that fails, start again at 2.
       Done when each item found on the way has its entry, main is at the run's branch and
-      `make check` on it is green. Report
+      the code that lands has a green `make check`: yours after a merge that brought
+      commits, the reviewer's otherwise. Report
       `merged`; LADO then ends the run, closes its workers and removes its worktree and
       branch.
     outcomes: {merged: done, conflict: implement, red: implement}
