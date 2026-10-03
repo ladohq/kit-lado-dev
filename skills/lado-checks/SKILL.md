@@ -16,7 +16,7 @@ yourself after your last change; quote it.
 | Pure logic works | `make test` | After any change; fastest feedback. |
 | Behaviour across processes works (tmux, git, hooks, `lado mcp`, SQLite) | `make test-integration` | After touching `runtime.py`, `hooks.py`, `mcp_server.py`, `tmux.py`, `state.py` or a provider. Uses the fake agent, no LLM. |
 | The Kilo plugin works | `make test-js` | After touching `kilo_plugin.js` or its tests. |
-| The change is ready | `make check` | Always, last, before you report done. It runs all four above. |
+| The change is ready | `make check` | Developer: always, last, before you report done. Reviewer and merge step: as the rules below say. It runs all four above. |
 | A real agent CLI still works | `make test-live PROVIDER=claude` or `PROVIDER=kilo` | After changing a provider, and on main before a release. Ask the supervisor first for Claude: it uses a paid model. |
 
 Done when: the report names each command you ran and its last summary line (for pytest,
@@ -34,10 +34,18 @@ Checks are slow; run each one once, when it proves something new.
   how agents get their input, and only once per round. A reviewer does not run it again
   when the developer's report shows it green on the reviewed commit; it reruns
   `make check` only.
-- A reviewer runs `make check` once per review, and on a re-review only when code changed
-  since the commit it last checked (not for docs or BACKLOG.md only).
-- The merge step runs `make check` only when `git merge main` brought new commits; when it
-  says "Already up to date", the reviewed commit is what lands.
+- **Non-code paths** are BACKLOG.md, ROADMAP.md, README.md, AGENTS.md, CLAUDE.md and
+  anything under `docs/`. Every other path is code, also a `.md` under `src/` (`make check`
+  validates the built-in kits) or under `tests/`.
+- A reviewer runs `make check` once per review and names the commit it ran on in its
+  review. On a re-review it keeps that result only when every path in
+  `git diff --name-only <that commit> HEAD` is a non-code path; otherwise it runs it again.
+- The merge step skips `make check` only when both hold: `git merge main` brought nothing
+  (`git rev-parse HEAD` is the same before and after it; git's "Already up to date" is
+  only a hint, its wording depends on the version and locale), and the approving review
+  names the commit its green `make check` ran on and `git log --name-only <that
+  commit>..HEAD` shows only non-code paths (such as the merge step's BACKLOG.md commit).
+  Otherwise it runs `make check`.
 - A release runs no separate `make check`: main was checked at each merge and CI checks
   the pushed commit. It needs `make test-live` on main and green CI on the release commit.
 - Never pipe a check whose result gates something (`make check | tail` hides a red exit

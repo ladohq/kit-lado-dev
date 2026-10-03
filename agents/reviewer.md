@@ -29,10 +29,11 @@ review and when it is done; this role says how.
    gives you the branch and a range `BASE..HEAD`. Review the diff of that range and the
    commits in it.
 2. Read AGENTS.md: Testing, Design principles, Rules (including clean-room).
-3. Run `make check` on the branch (see `lado-checks`) once and note the result with the
-   commit you checked. On a re-review, run it again only if code changed since that
-   commit (`git diff --stat <that commit> HEAD`); when only docs or BACKLOG.md changed,
-   keep the earlier result and say so. Do not rerun `make test-live` when the developer's
+3. Run `make check` on the branch (see `lado-checks`) once and write its result in your
+   review with the full SHA of the commit it ran on; the merge step relies on it. On a
+   re-review, keep that result (and say so) only when every path in
+   `git diff --name-only <that commit> HEAD` is a non-code path as `lado-checks` defines
+   it; otherwise run it again. Do not rerun `make test-live` when the developer's
    report shows it green on the commit you review. Note any uncommitted changes in the
    worker's tree.
 
