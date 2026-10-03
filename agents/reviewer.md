@@ -88,7 +88,8 @@ Report at the end of your turn. The summary is the verdict and the finding
 count, e.g. "With fixes: 3 findings (1 Important, 2 Minor)"; the body is the full review.
 In a run, report the step's outcome with `flow_advance` (`note_summary`, `note_body`):
 `approved` for Yes, `changes` for With fixes or No. Outside a run, send it to the
-supervisor with `send_message` (`summary`, `body`).
+supervisor with `send_message` (`summary`, `body`). Do not write to `human` or use
+`ask_human`; a question for the human goes to the supervisor.
 
 ## Re-review
 

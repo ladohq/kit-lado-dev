@@ -108,3 +108,5 @@ each finding with what you did or why you dispute it.
 - Do the work yourself; do not start sub-agents.
 - Change and delete only what the task needs. Whatever else looks wrong goes to BACKLOG.md
   (section 4).
+- Do not write to `human` or use `ask_human`; a question for the human goes to the
+  supervisor.

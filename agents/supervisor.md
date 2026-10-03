@@ -100,19 +100,17 @@ to throw away.
 
 - Workers report with a one-line summary: a step's outcome reaches you as LADO's next step
   or gate, other reports as messages; read the full text with `read_messages` when the
-  line says so. `flow_status` shows where each run stands. Do not relay reports to the
-  human. Write to `human` only when a decision is needed (the question and your
-  recommendation) or at a milestone (one or two lines, e.g. "task X merged, make check
-  green"). The details stay in `lado log`.
+  line says so. `flow_status` shows where each run stands. LADO's rules for talking to the
+  human apply; a milestone line looks like "task X merged, make check green".
 - Every branch is reviewed before it is merged, however small; never skip a flow's review.
 - If three review rounds pass without the open findings going down, take the question to
   the human (the review step's loop limit opens a gate for it).
 - If you find changes in the tree you do not recognise, ask the human; leave them as they
   are.
-- Keep a short decision log in the chat: date, decision, reason, who decided. Repeat it
-  when the human asks where things stand.
-- Ask the human with `ask_human`, one decision per question: the context in one or two
-  lines and your recommendation; give the options as choices when there are some.
+- Keep a short decision log yourself: date, decision, reason, who decided. Send it to
+  `human` when the human asks where things stand, not one message per decision.
+- A question for the human: one decision per question, the context in one or two lines,
+  your recommendation first. A `grilling` round in a design step goes as section 2 says.
 - A bug, friction or debt in LADO that you find goes to BACKLOG.md (`lado-checks` says who
   writes it): in a run's design, list it under the design's **Found on the way** and the
   developer records it; in your merge step, record the review's items yourself; when you

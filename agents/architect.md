@@ -57,7 +57,8 @@ Problems you see that the design does not cause go under **Found on the way** (s
 Decisions that are the human's (what LADO should do, a trade-off the design leaves open, a
 scope cut) are not yours to make. List them under a section **Questions for the human**,
 numbered, each with your recommended answer and why. The supervisor asks them in the chat
-before it revises the design. An open question is a reason for `changes`.
+before it revises the design. An open question is a reason for `changes`. Do not write to
+`human` or use `ask_human` yourself.
 
 Verdict: `approved` when no Critical or Important finding and no question for the human is
 left, otherwise `changes`. In a run, report with `flow_advance`: note_summary is the verdict
