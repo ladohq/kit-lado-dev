@@ -29,7 +29,7 @@ Checks are slow; run each one once, when it proves something new.
 - While working, run only the tests next to your change (`uv run pytest tests/test_x.py -k
   name`); run the full `make check` once, after your last change, before you report.
 - A change only to non-code paths (defined below) needs `make lint` only; a change to a
-  kit in lado-kits needs `lado kits check`. Any other change needs `make check`.
+  kit (its own repository, e.g. kit-lado-dev) needs `lado kits check`. Any other change needs `make check`.
 - `make test-live` runs only when the change touches a provider, hooks, the MCP server or
   how agents get their input, and only once per round. A reviewer does not run it again
   when the developer's report shows it green on the reviewed commit; it reruns
