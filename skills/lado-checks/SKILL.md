@@ -1,6 +1,6 @@
 ---
 name: lado-checks
-description: Which LADO check proves which claim, how to read a failure, how the merge step merges a run's branch, and how to record a bug, friction or debt in BACKLOG.md and who records it. Use before saying work on the LADO repo is done, when a check fails, when you merge a run's branch, or when you find a LADO bug or debt.
+description: Which LADO check proves which claim, how to read a failure, how the merge step merges a run's branch, and how to record a bug, friction or debt in BACKLOG.md and who records it. Use before saying work on the LADO repo is done, when a check fails, when you merge a run's branch, or when you find a LADO bug or debt. It names the LADO commands and rules; `verification-before-completion` and `diagnosing-bugs` hold the general discipline.
 ---
 
 # LADO checks
@@ -17,7 +17,7 @@ yourself after your last change; quote it.
 | Behaviour across processes works (tmux, git, hooks, `lado mcp`, SQLite) | `make test-integration` | After touching `runtime.py`, `hooks.py`, `mcp_server.py`, `tmux.py`, `state.py` or a provider. Uses the fake agent, no LLM. |
 | The Kilo plugin works | `make test-js` | After touching `kilo_plugin.js` or its tests. |
 | The change is ready | `make check` | Developer: last, before you report done, except a change only to non-code paths (below), which needs `make lint` only. Reviewer and merge step: as the rules below say. It runs all four above. |
-| A real agent CLI still works | `make test-live PROVIDER=claude` or `PROVIDER=kilo` | After changing a provider, and on main before a release. For Claude, ask the human, through the supervisor, every time: it uses a paid model. |
+| A real agent CLI still works | `make test-live PROVIDER=claude` or `PROVIDER=kilo` | Developer: after `make check`, when the rule below says. Release: on main. For Claude, ask the human, through the supervisor, every time: it uses a paid model. |
 
 Done when: the report names each command you ran and its last summary line (for pytest,
 the `N passed` line).
@@ -31,9 +31,11 @@ Checks are slow; run each one once, when it proves something new.
 - A change only to non-code paths (defined below) needs `make lint` only; a change to a
   kit (its own repository, e.g. kit-lado-dev) needs `lado kits check`. Any other change needs `make check`.
 - `make test-live` runs only when the change touches a provider, hooks, the MCP server or
-  how agents get their input, and only once per round. A reviewer does not run it again
-  when the developer's report shows it green on the reviewed commit; it reruns
-  `make check` only.
+  how agents get their input, and only once per round: the developer runs it and reports
+  it. For `PROVIDER=claude` it asks the supervisor and waits for the human's yes; on a no,
+  its report says the live check did not run (DONE_WITH_CONCERNS). A reviewer does not
+  run it: it checks that the developer's report shows it green on the reviewed commit, or
+  names its absence as a finding, and reruns `make check` only.
 - **Non-code paths** are BACKLOG.md, ROADMAP.md, README.md, AGENTS.md, CLAUDE.md and
   anything under `docs/`. Every other path is code, also a `.md` under `src/` (`make check`
   validates the built-in kits) or under `tests/`.
@@ -49,8 +51,8 @@ Checks are slow; run each one once, when it proves something new.
 - A release runs no separate `make check`: main was checked at each merge and CI checks
   the pushed commit. It needs `make test-live` on main and green CI on the release commit.
 - Never pipe a check whose result gates something (`make check | tail` hides a red exit
-  status): write it to a log (`make check > <log> 2>&1`), take the exit status, then read
-  the log's last lines.
+  status): write it to a log outside the tree (`make check > <log> 2>&1`; a log in the
+  worktree is an uncommitted change), take the exit status, then read the log's last lines.
 - Never start a second long check while one runs; wait for its result.
 
 ## Merging a run's branch
@@ -64,8 +66,9 @@ on the way, then checks the branch together with the current main before main mo
    conflicts, `git merge --abort` and report `conflict`, with the conflicting files in the
    note.
 3. Run `make check` unless the merge-step rule in "Run as little as proves the claim"
-   lets you skip it, never piped, with the log outside the tree. If it is red, report
-   `red`, with the failing output in the note.
+   lets you skip it. If it is red, classify the failure as "When a check fails" says.
+   Report `red`, with the failing output in the note, only for code or test; for
+   environment, tell the human what is missing and leave the step open.
 4. In your repo, on main, `git merge --ff-only <the run's branch>`. If main moved in the
    meantime and that fails, start again at 2.
 

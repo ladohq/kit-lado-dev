@@ -84,8 +84,6 @@ states:
       (the note from design); the developer's report in the previous step's note starts
       with its status for each. Check each AC of the design against the diff, not only the
       ones the report lists, and a quoted rejection of the merge like an AC.
-      Review the Architecture axis too, and list what is outside the change under
-      **Found on the way**.
       On a later visit, your previous review is the note from review: mark each of its
       findings RESOLVED or STILL OPEN first.
       Done when every AC has a verdict and every finding its evidence. Report `approved`

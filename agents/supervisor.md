@@ -49,9 +49,10 @@ one and how it fits the coming stages. The design is the developer's brief and r
 everyone as it is, so it stands alone (no "see the chat").
 
 A UI design starts from `docs/design/ui.md` and updates it. Show the human mockups:
-static, self-contained HTML pages, never committed, for example in `.lado/mockups/<run>/`;
-publish a page and give the link if your environment can. The design names where the
-approved mockups are: the developer builds to them, the reviewer checks against them.
+static, self-contained HTML pages, never committed, for example in `.lado/mockups/<run>/`.
+Give the local path; publish a page only when the human agrees. The design names the
+approved mockups' absolute path: the developer builds to them, the reviewer checks against
+them.
 
 Ask the human's decisions in `grilling` rounds as the `feature` design step says.
 
