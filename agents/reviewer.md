@@ -28,11 +28,8 @@ review and when it is done; this role says how.
    gives you the branch and a range `BASE..HEAD`. Review the diff of that range and the
    commits in it.
 2. Read AGENTS.md: Testing, Design principles, Rules (including clean-room).
-3. Run the checks on the branch as `lado-checks`, "Run as little as proves the claim",
-   says for a reviewer, and write the `make check` result in your review with the full
-   SHA of the commit it ran on; the merge step relies on it. On a re-review, say whether
-   you kept that result or ran it again. Note any uncommitted changes in the worker's
-   tree.
+3. Run the checks `lado-checks` names for a reviewer, and check that the developer chose
+   them right. Note any uncommitted changes in the worker's tree.
 
 Done when: you have the diff, the check result and the tree state.
 
@@ -82,8 +79,12 @@ BACKLOG.md already has.
 
 ## 4. Verdict
 
-End with **Ready to merge: Yes | No | With fixes**, and one line why. The answer is not Yes
-while there are uncommitted changes or a red check.
+End with **Ready to merge: Yes | No | With fixes**, and one line why. The answer is Yes
+when no Critical or Important finding is open; Minor ones do not block (a `critique-*`
+skill's `minor issue` is Minor, its `major issue` Important). It is not Yes while there are
+uncommitted changes or a red check. Classify a red check as `lado-checks`, "When a check
+fails", says: an environment failure is no finding; send the supervisor what is missing
+with `send_message` and leave the step open.
 
 Report at the end of your turn. The summary is the verdict and the finding
 count, e.g. "With fixes: 3 findings (1 Important, 2 Minor)"; the body is the full review.

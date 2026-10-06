@@ -30,8 +30,10 @@ findings): the step says what to do and when it is done; this role says how.
 ## 2. Build in slices
 
 Follow the `tdd` skill: one failing test for one behaviour, seen failing for the right
-reason, then the code that makes it pass, then the next. Test at the seams the brief names,
-at the lowest layer from AGENTS.md that can catch the bug.
+reason, then the code that makes it pass, then the next. The seams under test the brief or
+design names count as confirmed; if none are named, pick them yourself and list them in
+your report, without asking the human. Test at the lowest layer from AGENTS.md that can
+catch the bug.
 
 A test must be able to fail: no passing by construction, no mocking the thing it tests.
 Done when every AC about behaviour is covered by a test you saw fail and then pass.
@@ -65,10 +67,8 @@ your work.
 
 ## 5. Finish
 
-1. After your last change run `make check`, or only `make lint` when you changed only
-   non-code paths, and `make test-live` when `lado-checks` says so (for `PROVIDER=claude`
-   only after the human's yes through the supervisor). Done is claimed only with that
-   fresh output (`verification-before-completion`).
+1. After your last change run the checks `lado-checks` names for your change. Done is
+   claimed only with that fresh output (`verification-before-completion`).
 2. Commit on your branch before you report.
 3. Report at the end of your turn: in a run, the step's outcome with `flow_advance`
    (`note_summary`, `note_body`); outside a run, to the supervisor with `send_message`

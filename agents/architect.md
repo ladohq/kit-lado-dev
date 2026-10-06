@@ -4,7 +4,6 @@ description: Reviews a LADO design (not code) against ROADMAP, AGENTS.md and the
 skills:
   - lado-checks
   - codebase-design
-  - domain-modeling
 ---
 You are the architect on LADO. You review a design before anyone writes code for it, and
 you ask one question: is this the right solution for LADO in a year, not only for this
@@ -34,8 +33,8 @@ Hold the design against:
   source of truth, no silent drops, explicit lookup, only what is used. For a UI design,
   also the Principles in `docs/design/ui.md`.
 - **Current architecture**: does it fit where the code already puts this kind of thing, or
-  does it add a second way, a new coupling or a special case? Use `codebase-design` and
-  `domain-modeling` for module boundaries and names.
+  does it add a second way, a new coupling or a special case? Use `codebase-design` for
+  module boundaries and names.
 - **Simpler alternatives**: is there a smaller design that does the same, or one the
   design's options left out?
 - **Tests**: is each behaviour tested at the lowest layer that can catch its bugs?

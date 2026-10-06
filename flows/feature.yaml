@@ -16,7 +16,7 @@ states:
       2. Look up facts yourself (code, docs, git history, BACKLOG.md). Use `grilling` to
          find the decisions that are the human's.
       3. Write a short design as your role says, with what changes and where, how it is
-         tested, what is left out, and numbered acceptance criteria (AC-1, AC-2, ...), each
+         tested and at which seams (the seams under test), what is left out, and numbered acceptance criteria (AC-1, AC-2, ...), each
          a fact a reviewer can check from the diff or a command's output. Bugs and debt
          you found outside the task go in its last section, **Found on the way**
          (`lado-checks`): the developer records them.
@@ -65,13 +65,13 @@ states:
       list the ones you applied and skipped in your report. On a later visit your previous
       report is the note from implement, and the previous step's note says what to fix:
       review findings, a conflict with main (merge main into the run's branch and resolve
-      it), a red `make check`, or the human's reason for rejecting the merge (quote it at
-      the top of your report).
+      it), a red check of the merge step, or the human's reason for rejecting the merge
+      (quote it at the top of your report).
       Done when every AC about behaviour is covered by a test you saw fail and then pass,
       each **Found on the way** item has its BACKLOG.md entry (your role, section 4), the
-      final check of your role's section 5 is green and the work is committed on the run's
-      branch. Report `done`: note_summary is your status and a one-line result; note_body
-      is your full report, and starts with every AC, written out in full, with its status
+      checks `lado-checks` names for your change are green and the work is committed on the
+      run's branch. Report `done`: note_summary is your status and a one-line result;
+      note_body is your full report (your role, section 5), and starts with every AC, written out in full, with its status
       and the test or command that shows it.
     outcomes: {done: review}
   review:

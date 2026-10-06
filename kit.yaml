@@ -1,5 +1,5 @@
 name: lado-dev
-version: 0.9.4
+version: 0.10.0
 description: >-
   Develop LADO itself for the long term: a supervisor that designs with the human and
   delegates, an architect that reviews each design against the roadmap, developers that
@@ -10,13 +10,33 @@ supervisor: supervisor
 dependencies:
   lado: ">=0.19"
   skills:
-    superpowers: https://github.com/obra/superpowers@v6.4.1
+    superpowers:
+      from: https://github.com/obra/superpowers@v6.4.1
+      folders:
+        - skills/verification-before-completion
+        - skills/receiving-code-review
     mattpocock-skills:
       from: https://github.com/mattpocock/skills@v1.2.3
-      folders: [skills/engineering, skills/productivity]
+      folders:
+        - skills/engineering/tdd
+        - skills/engineering/diagnosing-bugs
+        - skills/engineering/codebase-design
+        - skills/productivity/grilling
+        - skills/productivity/writing-for-agents
     anthropic-plugins:
       from: https://github.com/anthropics/claude-plugins-official@ab024cdcfa7ca80be204acd4907656ba5a968589
-      folders: [plugins/frontend-design/skills]
+      folders: [plugins/frontend-design/skills/frontend-design]
     designer-skills:
       from: https://github.com/Owl-Listener/designer-skills@9a6930cf84a822eb458624bd11c61aac5bbdf224
-      folders: [interaction-design/skills, visual-critique/skills]
+      folders:
+        - visual-critique/skills/critique-affordance
+        - visual-critique/skills/critique-color
+        - visual-critique/skills/critique-composition
+        - visual-critique/skills/critique-information-density
+        - visual-critique/skills/critique-typography
+        - visual-critique/skills/critique-visual-hierarchy
+        - interaction-design/skills/feedback-patterns
+        - interaction-design/skills/loading-states
+        - interaction-design/skills/error-handling-ux
+        - interaction-design/skills/navigation-patterns
+        - interaction-design/skills/state-machine
