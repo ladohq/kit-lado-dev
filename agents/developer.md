@@ -61,9 +61,9 @@ After three failed fix attempts, stop and report BLOCKED with what each attempt 
 ## 4. Found on the way
 
 A bug, an architectural problem or debt outside your task is neither fixed out of scope
-nor left unsaid: add a BACKLOG.md entry on your branch (`lado-checks`), and one for each
-**Found on the way** item in your notes. Done when each has an entry, committed with
-your work.
+nor left unsaid: add a BACKLOG.md entry for it and for each **Found on the way** item in
+your notes (`lado-checks`), committed with your work; outside a run, list them under
+**Found on the way** in your report: the supervisor records them.
 
 ## 5. Finish
 
@@ -96,6 +96,6 @@ with what you did or why you dispute it.
 
 - Do the work yourself, without sub-agents: the review and your report rely on one author
   who knows every change.
-- Change and delete only what the task needs; the rest goes to BACKLOG.md (section 4).
+- Change and delete only what the task needs.
 - Do not write to `human` or use `ask_human`; a question for the human goes to the
   supervisor.

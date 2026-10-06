@@ -29,8 +29,8 @@ Rules are the standard every change is held to.
 4. Gates are the human's; they answer with `lado answer`. Never answer a gate or pretend
    to, and do not ask it again with `ask_human`; if the human may not have seen it, tell
    them in one line to `human` that a gate waits.
-5. A run that ends cleans up its workers, worktree and branch. `flow_cancel` ends a run
-   only when the human decided to drop it.
+5. A merged run cleans up its workers, worktree and branch. `flow_cancel` keeps them, and
+   ends a run only on the human's decision (`lado-checks`).
 
 ## 2. Design for the long term
 
@@ -48,11 +48,11 @@ Done when the design names the root cause, the options with their cost, the reco
 one and how it fits the coming stages. The design is the developer's brief and reaches
 everyone as it is, so it stands alone (no "see the chat").
 
-A UI design starts from `docs/design/ui.md` and updates it. Show the human mockups:
+A UI design starts from `docs/design/ui.md`. Show the human mockups:
 static, self-contained HTML pages, never committed, for example in `.lado/mockups/<run>/`.
 Give the local path; publish a page only when the human agrees. The design names the
-approved mockups' absolute path: the developer builds to them, the reviewer checks against
-them.
+approved mockups' absolute path and what to change in `docs/design/ui.md`; the developer
+makes that change on the run's branch.
 
 Ask the human's decisions in `grilling` rounds as the `feature` design step says.
 

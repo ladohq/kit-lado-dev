@@ -94,7 +94,7 @@ Reverse check:
 
 ## 4. Complexity budget
 
-Output of the budget script for 0.10.0.
+Output of the budget script for 0.10.1.
 
 | Measure | Value | Zone | Reason, when not green |
 |---|---|---|---|
@@ -103,8 +103,8 @@ Output of the budget script for 0.10.0.
 | Work steps in `fix` | 3 | green | |
 | Gates in `feature` | 2 | green | |
 | Gates in `fix` | 1 | green | |
-| Words in the longest role prompt | 798 (developer) | green | |
-| Words in the lead's prompt | 798 | green | |
+| Words in the longest role prompt | 800 (developer) | green | |
+| Words in the lead's prompt | 800 | green | |
 | Own skills | 1 | green | |
 | MCP servers | 0 | green | |
 | Similar paragraphs | 3 pairs | yellow | Kept (the human, triage of `improve/lado-dev`): `feature` and `fix` are two flows by design (R2, R6); their `review` and `implement` differ in where the ACs come from (the design note or the task), and each `do` must read on its own. The architect/reviewer openings say the same about runs for two different roles. |
