@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="397" height="678" viewBox="0 0 397 678" role="img" aria-label="Flow fix">
+  <title>Flow fix</title>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <polygon points="0 0, 8 4, 0 8" fill="#6b7280"/>
+    </marker>
+  </defs>
+  <rect width="397" height="678" fill="#ffffff"/>
+  <text x="30" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="600" fill="#1b2236">fix</text>
+  <circle cx="276.8" cy="44.0" r="6" fill="#1b2236"/>
+  <path d="M 276.8 50.0 L 276.8 70.0" fill="none" stroke="#6b7280" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <path d="M 276.8 116.0 L 276.8 192.0" fill="none" stroke="#6b7280" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <text x="282.8" y="158.0" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#4b5563" text-anchor="start">done</text>
+  <path d="M 276.8 238.0 L 276.8 314.0" fill="none" stroke="#6b7280" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <text x="282.8" y="280.0" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#4b5563" text-anchor="start">approved</text>
+  <path d="M 186.8 215.0 L 80.0 215.0 L 80.0 99.0 L 186.8 99.0" fill="none" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arrow)"/>
+  <text x="182.8" y="211.0" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#4b5563" text-anchor="end">changes</text>
+  <path d="M 276.8 360.0 L 276.8 436.0" fill="none" stroke="#6b7280" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <text x="282.8" y="402.0" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#4b5563" text-anchor="start">approved</text>
+  <path d="M 186.8 337.0 L 62.0 337.0 L 62.0 99.0 L 186.8 99.0" fill="none" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arrow)"/>
+  <text x="182.8" y="333.0" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#4b5563" text-anchor="end">rejected</text>
+  <path d="M 276.8 482.0 L 276.8 558.0" fill="none" stroke="#6b7280" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <text x="282.8" y="524.0" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#4b5563" text-anchor="start">merged</text>
+  <path d="M 186.8 459.0 L 44.0 459.0 L 44.0 99.0 L 186.8 99.0" fill="none" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arrow)"/>
+  <text x="182.8" y="455.0" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#4b5563" text-anchor="end">conflict | red</text>
+  <g data-state="implement" data-kind="work">
+    <rect x="186.8" y="70.0" width="180" height="46" rx="8" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+    <text x="276.8" y="90.0" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#1b2236">implement</text>
+    <text x="276.8" y="106.0" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#1b2236">developer</text>
+  </g>
+  <g data-state="review" data-kind="work">
+    <rect x="186.8" y="192.0" width="180" height="46" rx="8" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+    <text x="276.8" y="212.0" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#1b2236">review</text>
+    <text x="276.8" y="228.0" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#1b2236">reviewer · max_visits 3</text>
+  </g>
+  <g data-state="merge_ok" data-kind="gate">
+    <rect x="186.8" y="314.0" width="180" height="46" rx="8" fill="#fdf0e7" stroke="#d06a2c" stroke-width="1.5"/>
+    <text x="276.8" y="334.0" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#a0522d">merge_ok</text>
+    <text x="276.8" y="350.0" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#a0522d">gate: approval</text>
+  </g>
+  <g data-state="merge" data-kind="work">
+    <rect x="186.8" y="436.0" width="180" height="46" rx="8" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+    <text x="276.8" y="456.0" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#1b2236">merge</text>
+    <text x="276.8" y="472.0" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#1b2236">supervisor</text>
+  </g>
+  <g data-state="done" data-kind="end">
+    <rect x="186.8" y="558.0" width="180" height="46" rx="8" fill="#e8f6ee" stroke="#36a86e" stroke-width="1.5"/>
+    <text x="276.8" y="578.0" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#2a7a50">done</text>
+    <text x="276.8" y="594.0" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#2a7a50">end</text>
+  </g>
+  <rect x="30.0" y="634.0" width="14" height="14" rx="3" fill="#ffffff" stroke="#9ca3af"/>
+  <text x="50.0" y="645.0" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#1b2236">work step (agent)</text>
+  <rect x="180.0" y="634.0" width="14" height="14" rx="3" fill="#fdf0e7" stroke="#d06a2c"/>
+  <text x="200.0" y="645.0" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#a0522d">gate (human)</text>
+  <rect x="330.0" y="634.0" width="14" height="14" rx="3" fill="#e8f6ee" stroke="#36a86e"/>
+  <text x="350.0" y="645.0" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#2a7a50">end</text>
+  <path d="M 480.0 641.0 L 506.0 641.0" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3"/>
+  <text x="512.0" y="645.0" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#4b5563">back to an earlier step</text>
+</svg>

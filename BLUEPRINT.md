@@ -31,11 +31,14 @@ the triage of run `improve/lado-dev` (2026-10-06).
   name no check commands; `lado-checks` says what to check for a change. *Source:* the
   human, triage of `improve/lado-dev`.
 - **R9** A release needs green CI and green live tests on the release commit; no
-  separate full local check (CI runs everything `make check` runs). A paid live run with a
-  real model needs the human's yes every time; when the human declines it, the other
-  providers' live tests run and the human decides whether to release. *Source:* triage of
-  `improve/lado-dev` (question 1); `skills/lado-checks`; F3.1, F5.2, F6.1 of the 0.10.0
-  report.
+  separate full local check (CI runs everything `make check` runs). The human's request to
+  release allows one direct commit on main, the version bump; then main is pushed, CI on
+  it must be green, and only then is the tag pushed (pushing the tag publishes to PyPI). A
+  paid live run with a real model needs the human's yes every time; when the human
+  declines it, the live tests of the other providers the change needs must be green, and
+  the human decides whether to release. *Source:* triage of `improve/lado-dev`
+  (question 1) and `improve/lado-dev-3` (question 2); `skills/lado-checks`; F3.1, F5.2,
+  F6.1 of the 0.10.0 report; F12.1, F3.9, F6.2 of the 0.10.1 report.
 - **R10** UI work follows `docs/design/ui.md` and the mockups the human approved, and is
   reviewed against them. *Source:* `agents/supervisor.md` §2, `agents/developer.md` §2,
   `agents/reviewer.md` §2.
@@ -49,6 +52,64 @@ Archetype "Feature with design gate", with two changes:
   with the human, so an independent design review needs a fresh look;
 - a second flow, `fix`, is the "Solo + reviewer" shape for small changes (R6), so they do
   not pay for a design step.
+
+Flow skeletons, as LADO runs them (added in 0.10.2; the flows did not change):
+
+```yaml
+name: feature
+start: design
+states:
+  design:
+    agent: supervisor
+    outcomes: {ready: architecture}
+  architecture:
+    agent: architect
+    max_visits: 3
+    outcomes: {approved: design_ok, changes: design}
+  design_ok:
+    gate: approval
+    outcomes: {approved: implement, rejected: design}
+  implement:
+    agent: developer
+    outcomes: {done: review}
+  review:
+    agent: reviewer
+    max_visits: 3
+    outcomes: {approved: merge_ok, changes: implement}
+  merge_ok:
+    gate: approval
+    outcomes: {approved: merge, rejected: implement}
+  merge:
+    agent: supervisor
+    outcomes: {merged: done, conflict: implement, red: implement}
+  done:
+    end: true
+```
+
+![feature](blueprint-flows/feature.svg)
+
+```yaml
+name: fix
+start: implement
+states:
+  implement:
+    agent: developer
+    outcomes: {done: review}
+  review:
+    agent: reviewer
+    max_visits: 3
+    outcomes: {approved: merge_ok, changes: implement}
+  merge_ok:
+    gate: approval
+    outcomes: {approved: merge, rejected: implement}
+  merge:
+    agent: supervisor
+    outcomes: {merged: done, conflict: implement, red: implement}
+  done:
+    end: true
+```
+
+![fix](blueprint-flows/fix.svg)
 
 ## 3. Traceability
 
@@ -113,6 +174,7 @@ Output of the budget script for 0.10.1.
 
 | Date | Version | Change | ← Fact (session, run, metric or report) |
 |---|---|---|---|
+| 2026-10-07 | 0.10.2 | `lado-checks`: one short rule for targeted tests (each `test_*.py` the import search finds, with its folder's `-m`; conftest and helpers pull in nothing; no hit or more than 10 unit files → `make test`; no module lists for a layer); a live provider skipped for an environment cause is a concern for `merge_ok`; on a no to Claude only the providers the change needs; at merge a red `make check` is rerun once before it is classified, and a BACKLOG.md-only commit after a green check needs no new check; the BACKLOG.md template carries `Size:`/`Why here:`. Supervisor: release order (version commit on main, push main, green CI, then the tag); an environment message from a worker leaves its step open; `flow_cancel` finishes workers and keeps worktree and branch. R9 updated. Flow skeletons added to §2. | The human: simplify instead of patching (triage of `improve/lado-dev-3`); F3.3, F3.7, F5.8, F3.8, F3.9, F3.10, F3.11, F12.1, F7.1, F5.9, F5.10, F6.2 of `kit-reports/lado-dev-0.10.1-2026-10-06.md`. |
 | 2026-10-06 | 0.10.1 | `lado-checks`: live tests without Claude and per provider, a skipped provider is not green, an exact threshold for targeted tests and what `make test` replaces, no UI/integration suites pulled by a provider change, flaky at merge, a failing check of any kind, `-n auto` not for live, who acts on "When a check fails", BACKLOG.md tiers, the run's branch kept after a cancel. Reviewer: approved mockups win over `critique-*`. Developer: BACKLOG.md items outside a run go to the supervisor. Supervisor: the developer changes `docs/design/ui.md` on the run's branch. R9 updated. | F3.1–F3.6, F5.1–F5.7, F6.1, F2.1 of `kit-reports/lado-dev-0.10.0-2026-10-06.md`. |
 | 2026-10-06 | 0.10.0 | Restored this blueprint. | No BLUEPRINT.md; triage of `improve/lado-dev`. |
 | 2026-10-06 | 0.10.0 | Checks: targeted during `implement` and `review` by a "changed path → what to run" table in `lado-checks`; full `make check` only, and always, at `merge` (red: code/test → `red`, environment → the human); no separate full check before a release. Roles and flows name no check commands. | The human's request; `make test` takes 3 min 41 s; F3.3, F5.1, F6.1, F6.2, F6.3 of the 0.9.4 report. |
