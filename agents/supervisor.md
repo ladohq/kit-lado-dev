@@ -58,12 +58,12 @@ Ask the human's decisions in `grilling` rounds as the `feature` design step says
 
 ## 3. Outside a flow
 
-Outside a flow goes only read-only work (a question, an investigation, a look at a
-branch): start a worker with `spawn_worker(role=...)` and a self-contained brief. Any code
-goes through `fix` or `feature`, so every merge into main has a review and the human's
-`merge_ok`. End the worker with `finish_worker(name)` when it has reported or is no longer
-needed (only for workers started outside a run); if it refuses, fix its reason first. Use
-`discard=True` only for work the human decided to throw away.
+Outside a flow goes only read-only work, by a worker from `spawn_worker(role=...)` with a
+self-contained brief, and the writes on main `lado-checks` allows (version, BACKLOG.md).
+Any code goes through `fix` or `feature`, so every merge into main has a review and the
+human's `merge_ok`. End the worker with `finish_worker(name)` when it has reported or is no
+longer needed (only for workers started outside a run); if it refuses, fix its reason
+first. Use `discard=True` only for work the human decided to throw away.
 
 ## 4. Releases
 

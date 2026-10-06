@@ -1,6 +1,6 @@
 ---
 name: lado-checks
-description: Which LADO checks to run for a change (by changed path) and who runs them, how the merge step merges a run's branch with the full check, how to read a failure, and how to record a bug, friction or debt in BACKLOG.md and who records it. Use before running checks or saying work on the LADO repo is done, when a check fails, when you merge a run's branch, or when you find a LADO bug or debt. It names the LADO commands and rules; `verification-before-completion` and `diagnosing-bugs` hold the general discipline.
+description: Which LADO checks to run for a change (by changed path) and who runs them, how the merge step merges a run's branch with the full check, how to read a failure, and how to record a bug, friction or debt in BACKLOG.md and who records it. Use before running checks or saying work on the LADO repo is done, when a check fails, when you merge a run's branch, when you release LADO, or when you find a LADO bug or debt. It names the LADO commands and rules; `verification-before-completion` and `diagnosing-bugs` hold the general discipline.
 ---
 
 # LADO checks
@@ -18,13 +18,15 @@ This section is for the LADO repository. In a kit's own repository (e.g. kit-lad
 there is no Makefile: `lado kits check .` is its only check, during work and at merge.
 
 The changed files are `git diff --name-only main...HEAD` plus uncommitted ones. Always run
-`make lint` (`make fmt` fixes most of it), then for each changed path its row:
+`make lint` (`make fmt` fixes most of it), then for each changed path every row that
+matches it:
 
 | Changed path | Run |
 |---|---|
 | `src/lado/**.py` | each `test_*.py` the search below finds, with its folder's `-m` |
-| A test file outside `tests/live/` | that file, with its folder's `-m` |
-| `web/` | `make web` (also fails on a stale `web/openapi.json`), `make browser`, then the UI tests of each screen it changes, by file name (`tests/ui/test_<screen>.py`) |
+| A `test_*.py` file outside `tests/live/` | that file, with its folder's `-m` |
+| A `conftest.py` or helper under `tests/`, outside `tests/live/` | each `test_*.py` in its folder, with its `-m`; for one directly in `tests/`, `make test` |
+| `web/` | `make web` (also fails on a stale `web/openapi.json`), `make browser`, then the UI tests of each screen it changes, by file name (`tests/ui/test_<screen>.py`); for a file that names no screen (e.g. `Shell.tsx`, `App.tsx`, `styles.css`, `tokens.css`, `api.ts`, `live.ts`, `Settings.tsx`, `Team.tsx`, `Sessions.tsx`), all of `tests/ui/` with `-m ui` |
 | `src/lado/providers/opencode_plugin.js`, `tests/js/` | `make test-js` |
 | `tests/live/` | the live tests, as below |
 | Only non-code paths: BACKLOG.md, ROADMAP.md, README.md, AGENTS.md, CLAUDE.md, `docs/` | nothing more. Any other path is code, also a `.md` under `src/` or `tests/` |
@@ -42,9 +44,10 @@ grep -rlE "^\s*(from $P import .*\b<mod>\b|(from|import) $P\.<mod>\b)" tests --i
 Only `test_*.py` hits run; a hit in a `conftest.py` or a helper pulls in nothing. Each runs
 with its folder's `-m`: `tests/` none, `tests/integration/` `-m integration`, `tests/ui/`
 `-m ui` (after `make web` and `make browser`). When a changed module has no `test_*.py`
-hit, or more than 10 unit hits, run `make test` in place of its unit hits. Integration
-and UI tests run only as hits, and with none, none run: the full `make check` at merge
-covers them, so a short rule both developer and reviewer apply alike beats a complete one.
+hit, or more than 10 unit hits (both searches together), run `make test` in place of its
+unit hits. Integration and UI tests run only as hits, and with none, none run: the full
+`make check` at merge covers them, so a short rule both developer and reviewer apply alike
+beats a complete one.
 
 `pyproject.toml` sets `addopts = -m 'not integration and not live and not ui'`, so an
 integration or UI file run without its `-m` is silently dropped: a `0 passed` or `no tests
@@ -54,8 +57,9 @@ command: the Makefile passes it, and without it pytest runs one test at a time (
 instead of seconds). Live tests run serially, through `make test-live`.
 
 **Live tests** (`-m live`: `make test-live`, anything under `tests/live/`) drive real agent
-CLIs and models. They run only when the change touches a provider, hooks, the MCP server,
-how agents get their input or `tests/live/`, once per round, by the developer, after the
+CLIs and models. They run only when the change touches `src/lado/providers/`,
+`src/lado/hooks.py`, `src/lado/mcp_server.py`, `src/lado/runtime.py`,
+`src/lado/agent_env.py` or `tests/live/`, once per round, by the developer, after the
 checks above, and at a release. A change to one provider runs only that provider's
 (`PROVIDER=<name>`). A run with `PROVIDER=claude`, or with no `PROVIDER` (every provider,
 Claude included), uses a paid model: whoever runs it, the developer through the supervisor
@@ -89,10 +93,13 @@ set, which runs at merge.
 - **Release** (the supervisor, only when the human asks): the request allows one direct
   commit on main, the version bump (`uv version <X.Y.Z>`, commit). Then, in this order:
   push main; wait for green CI on that commit (CI runs everything `make check` runs, so no
-  separate `make check`); the live tests, as above; push the tag `vX.Y.Z`, which publishes
-  to PyPI. The tag needs green CI and green live tests on that commit; when the human declines
-  Claude's run, the other providers' live tests must be green and the human decides whether
-  to release. Each push needs the human's yes.
+  separate `make check`); the live tests of every provider (`make test-live`); push the tag
+  `vX.Y.Z`, which publishes to PyPI. The tag needs green CI and green live tests on that
+  commit. When the human declines Claude's run, run every other provider, one `make
+  test-live PROVIDER=<name>` each; they must be green, and the human decides whether to
+  release. Red CI or live tests: no tag; tell the human, quoting the failing line; the fix
+  goes through `fix`, then the release goes on from pushing main with the same version.
+  Each push needs the human's yes.
 
 `make check` runs `make lint`, `make test-js`, `make web` and `make browser`, then one
 parallel pytest run of the unit, integration and UI tests (`-m 'not live'`).
@@ -115,14 +122,16 @@ on the way, then checks the branch together with the current main before main mo
    the whole check once before classifying; this rerun takes the place of the reruns in
    "When a check fails". Green: it was flaky; add its BACKLOG.md entry on the run's branch
    and go on (a commit of BACKLOG.md alone after a green check needs no new check). Red
-   again: classify the first error as "When a check fails" says. Code or test: report
-   `red`, with the failing output in the note; the task goes back to `implement`.
+   again: classify the second run's first error, as code, test or environment ("When a
+   check fails"). Code or test: report `red`, with the failing output in the note; the
+   task goes back to `implement`.
    Environment: tell the human what is missing and leave the step open.
 4. In your repo, on main, `git merge --ff-only <the run's branch>`. If main moved in the
    meantime and that fails, start again at 2.
 
 Done when each item found on the way has its entry, main is at the run's branch and the
-check of step 3 was green on it. Then report `merged`.
+check of step 3 was green on it, or on its parent when the last commit only adds
+BACKLOG.md entries. Then report `merged`.
 
 ## When a check fails
 
@@ -138,7 +147,9 @@ says.
      as flaky with the failing line, and record it in BACKLOG.md. If it fails 3 times, it is
      not flaky: treat it as code or test.
    - **environment**: tmux, node, uv, a CLI login, a network or disk problem. Report what is
-     missing and the command that showed it; do not change code to work around it.
+     missing and the command that showed it; do not change code to work around it. The
+     developer reports BLOCKED; only a live provider skipped for it is DONE_WITH_CONCERNS
+     ("Live tests").
 3. Never mark a test skipped or loosen an assertion to get green.
 
 Done when: the failure has a class, a quoted line and, for code or test, a fix with the
@@ -161,8 +172,9 @@ Found: <YYYY-MM-DD>, <context: task or check where it showed up>.
 ```
 
 Keep it to a few lines; check first that no entry covers it already. Add it at the end of
-the tier it belongs to (P0–P3, as BACKLOG.md's header says): `.gitattributes` merges BACKLOG.md with `merge=union`, so entries that
-parallel branches add merge without a conflict. Mention the new entry in your report.
+the tier it belongs to (P0–P3, as BACKLOG.md's header says): `.gitattributes` merges
+BACKLOG.md with `merge=union`, so entries that parallel branches add merge without a
+conflict. Mention the new entry in your report.
 
 Who writes the entry: the next agent that writes on the run's branch. In a flow run the
 design and the read-only roles (architect, reviewer) list what they found under **Found on
