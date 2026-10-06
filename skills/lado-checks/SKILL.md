@@ -28,11 +28,14 @@ matches it:
 | `web/`, `src/lado/server/` | `make web` (also fails on a stale `web/openapi.json`), `make browser` once, then the UI tests (`uv run pytest -m ui tests/ui/test_<screen>.py`) of each screen it changes, by file name; all of `tests/ui/` when unsure |
 | `src/lado/providers/opencode_plugin.js`, `tests/js/` | `make test-js` |
 | A test file outside `tests/live/` | that file, with its layer's `-m` |
+| `tests/live/` | the live tests, as below |
 | Only non-code paths: BACKLOG.md, ROADMAP.md, README.md, AGENTS.md, CLAUDE.md, `docs/` | `make lint` only. Any other path is code, also a `.md` under `src/` or `tests/` |
 | Anything else: a path no row matches, a module the search finds no test file for or more than about 10 unit test files for | `make test` (all unit tests) |
 
 **The tests that import a module.** For `src/lado/<mod>.py` set `P=lado`, for
-`src/lado/<pkg>/<mod>.py` set `P=lado.<pkg>`, then:
+`src/lado/<pkg>/<mod>.py` set `P=lado.<pkg>`, then run the search below. For a module in a
+package, also run it with `P=lado` and `<mod>` set to `<pkg>`: many tests reach a module
+through its package (`from lado import providers`, then `providers.get("claude")`).
 
 ```bash
 grep -rlE "^\s*(from $P import .*\b<mod>\b|(from|import) $P\.<mod>\b)" tests --include='*.py' | grep -v '^tests/live/'
@@ -44,11 +47,12 @@ with `-m integration`, `tests/ui/` with `-m ui` (after `make web` and `make brow
 `pyproject.toml` sets `addopts = -m 'not integration and not live and not ui'`, so an
 integration or UI file run without its `-m` is silently dropped: a `0 passed` or `no tests
 ran` line proves nothing, and in a mixed run `N passed` hides the dropped files. Run each
-layer as its own command.
+layer as its own command, and add `-n auto` to every pytest command here: the Makefile
+passes it, and without it pytest runs one test at a time (minutes instead of seconds).
 
 **Live tests** (`-m live`: `make test-live`, anything under `tests/live/`) drive real agent
-CLIs and models. They run only when the change touches a provider, hooks, the MCP server or
-how agents get their input, once per round, by the developer, after the checks above, and
+CLIs and models. They run only when the change touches a provider, hooks, the MCP server,
+how agents get their input or `tests/live/`, once per round, by the developer, after the checks above, and
 at a release. A run with `PROVIDER=claude`, or with no `PROVIDER` (every provider, Claude
 included), uses a paid model: whoever runs it, the developer through the supervisor or the
 supervisor at a release, gets the human's yes first, every time, also inside a run. On a
@@ -66,14 +70,17 @@ the full set, which runs at merge.
   summary line (for pytest, the `N passed` line).
 - **Reviewer**: on the reviewed commit, run the same rows of the table yourself, and check
   that the developer's report ran every row the changed paths need. A missing or wrong
-  check is a finding: Important when your own run of it is red or cannot run (for an
-  environment cause, see "When a check fails"), otherwise Minor. Do not run live tests:
-  check that the report shows them green on the reviewed commit when the rule above needs
-  them, or name their absence as an Important finding. Name the commit your checks ran on.
+  check is a finding: Important when your own run of it is red for code or test,
+  otherwise Minor; a check that cannot run for an environment cause is no finding ("When a
+  check fails"). Do not run live tests: check that the report shows them green on the
+  reviewed commit when the rule above needs them, or name their absence as an Important
+  finding, unless the report says the human declined the paid run: then it is a concern
+  for `merge_ok`, not a finding. Name the commit your checks ran on.
 - **Merge step**: `make check`, always (below).
 - **Release**: no separate `make check`; CI runs everything `make check` runs on the
-  pushed commit. A release needs green CI on the release commit and the live tests on
-  main.
+  pushed commit. A release needs green CI and green live tests on the release commit. If
+  the human declines Claude's paid run, run the other providers' live tests, and the human
+  decides whether to release.
 
 `make check` runs `make lint`, `make test-js`, `make web` and `make browser`, then one
 parallel pytest run of the unit, integration and UI tests (`-m 'not live'`).
@@ -92,15 +99,15 @@ on the way, then checks the branch together with the current main before main mo
    run's worktree and commit it on the run's branch.
 2. In the run's worktree, `git merge main`. If it conflicts, `git merge --abort` and report
    `conflict`, with the conflicting files in the note.
-3. Run `make check`. If it is red, classify the failure as "When a check fails" says.
+3. Run `make check` (in a kit's own repository, `lado kits check .`). If it is red, classify the failure as "When a check fails" says.
    Report `red`, with the failing output in the note, only for code or test: the task goes
    back to `implement`. For environment, tell the human what is missing and leave the step
    open.
 4. In your repo, on main, `git merge --ff-only <the run's branch>`. If main moved in the
    meantime and that fails, start again at 2.
 
-Done when each item found on the way has its entry, main is at the run's branch and
-`make check` was green on it. Then report `merged`.
+Done when each item found on the way has its entry, main is at the run's branch and the
+check of step 3 was green on it. Then report `merged`.
 
 ## When a check fails
 
