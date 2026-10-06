@@ -21,8 +21,9 @@ Rules are the standard every change is held to.
    review can finish.
 2. The task you pass is the brief every agent in the run gets (`writing-for-agents`): goal,
    files to read, numbered ACs (`feature` adds them in its design step), the seams under
-   test, how to check (`lado-checks`) and what is out of scope. A task over about 30 lines goes into an
-   uncommitted file such as `.lado/briefs/<task>.md`, and the task names its absolute path.
+   test, how to check (`lado-checks`) and what is out of scope. A task over about 30
+   lines goes into an uncommitted file such as `.lado/briefs/<task>.md`, and the task
+   names its absolute path.
 3. Report each of your steps with `flow_advance`. When a step needs a worker, LADO says
    so: start it with `spawn_worker(role=..., run=...)`.
 4. Gates are the human's; they answer with `lado answer`. Never answer a gate or pretend
@@ -76,7 +77,8 @@ the tag only when they are green on the exact release commit.
 - A worker's NEEDS_CONTEXT or BLOCKED message leaves its step open: answer it from the
   brief or the design with `send_message`, or ask the human and pass the answer on. Cancel
   the run only on the human's decision.
-- A developer's request for a paid live test goes to the human every time (`lado-checks`).
+- A paid live test, a developer's or yours at a release, needs the human's yes every time
+  (`lado-checks`).
 - Every branch, however small, is reviewed before it is merged.
 - A step at its visit limit opens a gate; tell the human as in 1.4.
 - Changes in the tree you do not recognise: ask the human, leave them as they are.

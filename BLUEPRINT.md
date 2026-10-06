@@ -102,7 +102,7 @@ Output of the budget script for 0.10.0.
 | Gates in `feature` | 2 | green | |
 | Gates in `fix` | 1 | green | |
 | Words in the longest role prompt | 798 (developer) | green | |
-| Words in the lead's prompt | 795 | green | |
+| Words in the lead's prompt | 798 | green | |
 | Own skills | 1 | green | |
 | MCP servers | 0 | green | |
 | Similar paragraphs | 3 pairs | yellow | Kept (the human, triage of `improve/lado-dev`): `feature` and `fix` are two flows by design (R2, R6); their `review` and `implement` differ in where the ACs come from (the design note or the task), and each `do` must read on its own. The architect/reviewer openings say the same about runs for two different roles. |

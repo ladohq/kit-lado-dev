@@ -18,8 +18,8 @@ states:
       each **Found on the way** item has its BACKLOG.md entry (your role, section 4), the
       checks `lado-checks` names for your change are green and the work is committed on the
       run's branch. Report `done`: note_summary is your status and a one-line result;
-      note_body is your full report (your role, section 5), and starts with every AC, written out in full, with its status
-      and the test or command that shows it.
+      note_body is your full report (your role, section 5), and starts with every AC,
+      written out in full, with its status and the test or command that shows it.
     outcomes: {done: review}
   review:
     agent: reviewer

@@ -14,45 +14,65 @@ always, in the merge step, on the branch merged with main.
 
 ## What to check for a change
 
+This section is for the LADO repository. In a kit's own repository (e.g. kit-lado-dev)
+there is no Makefile: `lado kits check .` is its only check, during work and at merge.
+
 The changed files are `git diff --name-only main...HEAD` plus uncommitted ones. Run
 `make lint` (`make fmt` fixes most of it), then for each changed path every row that
 matches it:
 
 | Changed path | Run |
 |---|---|
-| `src/lado/<mod>.py`, `src/lado/<pkg>/<mod>.py` | `uv run pytest tests/test_<mod>.py` and each test file that imports the module (`grep -rlw <mod> tests/`) |
-| Code that drives processes, tmux, git, hooks, `lado mcp`, the server process or a provider (`runtime.py`, `hooks.py`, `mcp_server.py`, `tmux.py`, `state.py`, `loop.py`, `server/`, `providers/`) | also the matching `uv run pytest -m integration tests/integration/test_<x>.py` (fake agent, no LLM) |
-| `web/`, or the server's API or UI (`src/lado/server/`) | `make web` (also fails on a stale `web/openapi.json`), `make browser` once, then `uv run pytest -m ui tests/ui/test_<screen>.py` for each screen it touches |
+| `src/lado/**.py` | The test files that import the module (below), each with its layer's `-m` |
+| Code that drives processes, tmux, git, hooks, `lado mcp`, the server process or a provider (`runtime.py`, `hooks.py`, `mcp_server.py`, `tmux.py`, `state.py`, `loop.py`, `server/`, `providers/`) | also the integration tests: those the search below finds, or all of them (`uv run pytest -m integration`) when it finds none |
+| `web/`, `src/lado/server/` | `make web` (also fails on a stale `web/openapi.json`), `make browser` once, then the UI tests (`uv run pytest -m ui tests/ui/test_<screen>.py`) of each screen it changes, by file name; all of `tests/ui/` when unsure |
 | `src/lado/providers/opencode_plugin.js`, `tests/js/` | `make test-js` |
-| A test file | that file, with its `-m` |
+| A test file outside `tests/live/` | that file, with its layer's `-m` |
 | Only non-code paths: BACKLOG.md, ROADMAP.md, README.md, AGENTS.md, CLAUDE.md, `docs/` | `make lint` only. Any other path is code, also a `.md` under `src/` or `tests/` |
-| A kit, in its own repository (e.g. kit-lado-dev) | `lado kits check .` |
-| Code no row above matches | `make test` (all unit tests) |
+| Anything else: a path no row matches, a module the search finds no test file for or more than about 10 unit test files for | `make test` (all unit tests) |
 
-`pyproject.toml` sets `addopts = -m 'not integration and not live and not ui'`: a file under
-`tests/integration/` or `tests/ui/` run without its `-m integration` or `-m ui` silently
-collects zero tests. A `0 passed` or `no tests ran` line proves nothing.
+**The tests that import a module.** For `src/lado/<mod>.py` set `P=lado`, for
+`src/lado/<pkg>/<mod>.py` set `P=lado.<pkg>`, then:
 
-**Live tests** (`make test-live PROVIDER=claude|kilo|opencode`: real agent CLIs and
-models) run only when the change touches a provider, hooks, the MCP server or how agents
-get their input, once per round, by the developer, after the checks above. For
-`PROVIDER=claude` the developer asks the supervisor and waits for the human's yes, every
-time, also inside a run: it uses a paid model. On a no, the report says the live check did
-not run (DONE_WITH_CONCERNS).
+```bash
+grep -rlE "^\s*(from $P import .*\b<mod>\b|(from|import) $P\.<mod>\b)" tests --include='*.py' | grep -v '^tests/live/'
+```
+
+A hit that is not a `test_*.py` file (a `conftest.py`, a helper) stands for every test file
+in its folder. Run each hit with its folder's layer: `tests/` plain, `tests/integration/`
+with `-m integration`, `tests/ui/` with `-m ui` (after `make web` and `make browser`).
+`pyproject.toml` sets `addopts = -m 'not integration and not live and not ui'`, so an
+integration or UI file run without its `-m` is silently dropped: a `0 passed` or `no tests
+ran` line proves nothing, and in a mixed run `N passed` hides the dropped files. Run each
+layer as its own command.
+
+**Live tests** (`-m live`: `make test-live`, anything under `tests/live/`) drive real agent
+CLIs and models. They run only when the change touches a provider, hooks, the MCP server or
+how agents get their input, once per round, by the developer, after the checks above, and
+at a release. A run with `PROVIDER=claude`, or with no `PROVIDER` (every provider, Claude
+included), uses a paid model: whoever runs it, the developer through the supervisor or the
+supervisor at a release, gets the human's yes first, every time, also inside a run. On a
+no, the developer's report says the live check did not run (DONE_WITH_CONCERNS).
 
 ## Who runs what
 
+The rows of the table are the whole proof of a claim while a task is in work: "partial
+proves nothing" (`verification-before-completion`) means no fewer than the table names, not
+the full set, which runs at merge.
+
 - **Developer**: after your last change, the checks the table names for your change, and
-  nothing more; live tests as above. Your report names each command and its last summary
-  line (for pytest, the `N passed` line).
+  nothing more; after a `red` from the merge step, also the failing tests its note quotes,
+  each with its `-m`; live tests as above. Your report names each command and its last
+  summary line (for pytest, the `N passed` line).
 - **Reviewer**: on the reviewed commit, run the same rows of the table yourself, and check
-  that the developer's report ran every row the changed paths need; a missing or wrong
-  check is a finding. Do not run live tests: check that the report shows them green on
-  the reviewed commit when the rule above needs them, or name their absence as a finding.
-  Name the commit your checks ran on.
+  that the developer's report ran every row the changed paths need. A missing or wrong
+  check is a finding: Important when your own run of it is red or cannot run (for an
+  environment cause, see "When a check fails"), otherwise Minor. Do not run live tests:
+  check that the report shows them green on the reviewed commit when the rule above needs
+  them, or name their absence as an Important finding. Name the commit your checks ran on.
 - **Merge step**: `make check`, always (below).
 - **Release**: no separate `make check`; CI runs everything `make check` runs on the
-  pushed commit. A release needs green CI on the release commit and `make test-live` on
+  pushed commit. A release needs green CI on the release commit and the live tests on
   main.
 
 `make check` runs `make lint`, `make test-js`, `make web` and `make browser`, then one
