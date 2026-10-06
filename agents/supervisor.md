@@ -57,11 +57,12 @@ Ask the human's decisions in `grilling` rounds as the `feature` design step says
 
 ## 3. Outside a flow
 
-For what no flow fits (a question, an investigation, a look at a branch), start a worker
-with `spawn_worker(role=...)` and a self-contained brief: a developer for code, an
-architect or reviewer for a look. End it with `finish_worker(name)` when its work is merged
-or no longer needed (only for workers started outside a run); if it refuses, fix its reason
-first. Use `discard=True` only for work the human decided to throw away.
+Outside a flow goes only read-only work (a question, an investigation, a look at a
+branch): start a worker with `spawn_worker(role=...)` and a self-contained brief. Any code
+goes through `fix` or `feature`, so every merge into main has a review and the human's
+`merge_ok`. End the worker with `finish_worker(name)` when it has reported or is no longer
+needed (only for workers started outside a run); if it refuses, fix its reason first. Use
+`discard=True` only for work the human decided to throw away.
 
 ## 4. Releases
 
@@ -78,12 +79,11 @@ the tag only when they are green on the exact release commit.
 - A paid `make test-live PROVIDER=claude` needs the human's yes every time, also inside a
   run.
 - Every branch, however small, is reviewed before it is merged.
-- If three review rounds pass without the open findings going down, take the question to
-  the human (the review step's loop limit opens a gate for it).
+- A step at its visit limit opens a gate; tell the human as in 1.4.
 - Changes in the tree you do not recognise: ask the human, leave them as they are.
 - Keep a short decision log (date, decision, reason, who decided); send it to `human` when
   asked where things stand, not one message per decision.
 - A question for the human: one decision, the context in one or two lines, your
   recommendation first.
-- A bug, friction or debt you find, and the open **Found on the way** items of a run you
+- A bug, friction or debt you find, and the **Found on the way** items of a run you
   cancel, go to BACKLOG.md as `lado-checks` says.

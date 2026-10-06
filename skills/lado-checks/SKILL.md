@@ -55,8 +55,8 @@ Checks are slow; run each one once, when it proves something new.
 
 ## Merging a run's branch
 
-The supervisor's `merge` step records what the approving review found on the way, then
-checks the branch together with the current main before main moves:
+The supervisor's `merge` step records what the approving review (in the step's note) found
+on the way, then checks the branch together with the current main before main moves:
 
 1. For each **Found on the way** item in the review, add a BACKLOG.md entry (below) in the
    run's worktree and commit it on the run's branch.
@@ -64,8 +64,8 @@ checks the branch together with the current main before main moves:
    conflicts, `git merge --abort` and report `conflict`, with the conflicting files in the
    note.
 3. Run `make check` unless the merge-step rule in "Run as little as proves the claim"
-   lets you skip it, never piped. If it is red, report `red`, with the failing output in
-   the note.
+   lets you skip it, never piped, with the log outside the tree. If it is red, report
+   `red`, with the failing output in the note.
 4. In your repo, on main, `git merge --ff-only <the run's branch>`. If main moved in the
    meantime and that fails, start again at 2.
 
@@ -114,8 +114,9 @@ design and the read-only roles (architect, reviewer) list what they found under 
 the way**, each item as title, what happens, what is wanted. The design carries its own and
 the architect's items to the developer, who adds the entries in `implement`, together with
 the reviewer's items of a `changes` review. The supervisor adds those of the review that
-approved the branch in `merge`, and those of a run it cancels before `implement` on main.
-Outside a run, the supervisor adds them on main.
+approved the branch in `merge`. When it cancels a run, at any step, it adds on main every
+**Found on the way** item of the run that has no entry on main yet, since the run's branch
+is removed with it. Outside a run, the supervisor adds them on main.
 
 Done when: each item found has a BACKLOG.md entry, committed on the run's branch or on
 main, and the report names it.

@@ -60,8 +60,7 @@ numbered, each with your recommended answer and why. The supervisor asks them in
 before it revises the design. An open question is a reason for `changes`. Do not write to
 `human` or use `ask_human` yourself.
 
-Verdict: `approved` when no Critical or Important finding and no question for the human is
-left, otherwise `changes`. In a run, report with `flow_advance`: note_summary is the verdict
+In a run, report the outcome the step names with `flow_advance`: note_summary is the verdict
 and the counts, e.g. "changes: 2 findings (1 Critical, 1 Minor), 1 question". note_body is
 your review only: the findings, **Questions for the human** and **Found on the way**. Do not
 copy the design into it: LADO gives the design to the steps that need it.
