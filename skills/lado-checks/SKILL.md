@@ -1,6 +1,6 @@
 ---
 name: lado-checks
-description: Which LADO check proves which claim, how to read a failure, and how to record a bug, friction or debt in BACKLOG.md and who records it. Use before saying work on the LADO repo is done, when a check fails, or when you find a LADO bug or debt.
+description: Which LADO check proves which claim, how to read a failure, how the merge step merges a run's branch, and how to record a bug, friction or debt in BACKLOG.md and who records it. Use before saying work on the LADO repo is done, when a check fails, when you merge a run's branch, or when you find a LADO bug or debt.
 ---
 
 # LADO checks
@@ -16,8 +16,8 @@ yourself after your last change; quote it.
 | Pure logic works | `make test` | After any change; fastest feedback. |
 | Behaviour across processes works (tmux, git, hooks, `lado mcp`, SQLite) | `make test-integration` | After touching `runtime.py`, `hooks.py`, `mcp_server.py`, `tmux.py`, `state.py` or a provider. Uses the fake agent, no LLM. |
 | The Kilo plugin works | `make test-js` | After touching `kilo_plugin.js` or its tests. |
-| The change is ready | `make check` | Developer: always, last, before you report done. Reviewer and merge step: as the rules below say. It runs all four above. |
-| A real agent CLI still works | `make test-live PROVIDER=claude` or `PROVIDER=kilo` | After changing a provider, and on main before a release. Ask the supervisor first for Claude: it uses a paid model. |
+| The change is ready | `make check` | Developer: last, before you report done, except a change only to non-code paths (below), which needs `make lint` only. Reviewer and merge step: as the rules below say. It runs all four above. |
+| A real agent CLI still works | `make test-live PROVIDER=claude` or `PROVIDER=kilo` | After changing a provider, and on main before a release. For Claude, ask the human, through the supervisor, every time: it uses a paid model. |
 
 Done when: the report names each command you ran and its last summary line (for pytest,
 the `N passed` line).
@@ -27,7 +27,7 @@ the `N passed` line).
 Checks are slow; run each one once, when it proves something new.
 
 - While working, run only the tests next to your change (`uv run pytest tests/test_x.py -k
-  name`); run the full `make check` once, after your last change, before you report.
+  name`); run the final check below once, after your last change, before you report.
 - A change only to non-code paths (defined below) needs `make lint` only; a change to a
   kit (its own repository, e.g. kit-lado-dev) needs `lado kits check`. Any other change needs `make check`.
 - `make test-live` runs only when the change touches a provider, hooks, the MCP server or
@@ -45,13 +45,33 @@ Checks are slow; run each one once, when it proves something new.
   only a hint, its wording depends on the version and locale), and the approving review
   names the commit its green `make check` ran on and `git log --name-only <that
   commit>..HEAD` shows only non-code paths (such as the merge step's BACKLOG.md commit).
-  Otherwise it runs `make check`.
+  Then it says which commit's check stands. Otherwise it runs `make check`.
 - A release runs no separate `make check`: main was checked at each merge and CI checks
   the pushed commit. It needs `make test-live` on main and green CI on the release commit.
 - Never pipe a check whose result gates something (`make check | tail` hides a red exit
   status): write it to a log (`make check > <log> 2>&1`), take the exit status, then read
   the log's last lines.
 - Never start a second long check while one runs; wait for its result.
+
+## Merging a run's branch
+
+The supervisor's `merge` step records what the approving review found on the way, then
+checks the branch together with the current main before main moves:
+
+1. For each **Found on the way** item in the review, add a BACKLOG.md entry (below) in the
+   run's worktree and commit it on the run's branch.
+2. In the run's worktree, note `git rev-parse HEAD`, then `git merge main`. If it
+   conflicts, `git merge --abort` and report `conflict`, with the conflicting files in the
+   note.
+3. Run `make check` unless the merge-step rule in "Run as little as proves the claim"
+   lets you skip it, never piped. If it is red, report `red`, with the failing output in
+   the note.
+4. In your repo, on main, `git merge --ff-only <the run's branch>`. If main moved in the
+   meantime and that fails, start again at 2.
+
+Done when each item found on the way has its entry, main is at the run's branch and the
+code that lands has a green `make check`: yours, or the reviewer's when step 3 let you
+skip it. Then report `merged`.
 
 ## When a check fails
 
@@ -75,8 +95,7 @@ check green again.
 Record what you find outside your task instead of fixing it silently or working around it:
 a bug, a friction (a missing option, a confusing message), or debt (a design that a coming
 ROADMAP stage will have to undo, a patch over a root cause, a second source of truth).
-`BACKLOG.md` is the place until the task tracker is connected (ROADMAP stage 9); then the
-same entry goes to the tracker. Add a section:
+Add a section to `BACKLOG.md`:
 
 ```markdown
 ## <short title: what is wrong>

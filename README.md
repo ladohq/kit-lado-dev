@@ -25,7 +25,7 @@ Apache-2.0 licensed, the others MIT; thanks to their authors.
 
 | Name | Source | Author | Skills used |
 |---|---|---|---|
-| `superpowers` | https://github.com/obra/superpowers (tag `v6.4.1`) | Jesse Vincent | brainstorming, finishing-a-development-branch, verification-before-completion, receiving-code-review, requesting-code-review |
+| `superpowers` | https://github.com/obra/superpowers (tag `v6.4.1`) | Jesse Vincent | brainstorming, verification-before-completion, receiving-code-review |
 | `mattpocock-skills` | https://github.com/mattpocock/skills (tag `v1.2.3`) | Matt Pocock | grilling, writing-for-agents, tdd, diagnosing-bugs, codebase-design, domain-modeling |
 | `anthropic-plugins` | https://github.com/anthropics/claude-plugins-official (commit `ab024cd`) | Anthropic | frontend-design |
 | `designer-skills` | https://github.com/Owl-Listener/designer-skills (commit `9a6930c`) | MC Dean | critique-affordance, critique-color, critique-composition, critique-information-density, critique-typography, critique-visual-hierarchy, feedback-patterns, loading-states, error-handling-ux, navigation-patterns, state-machine |

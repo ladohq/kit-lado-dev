@@ -3,7 +3,6 @@ name: reviewer
 description: Reviews one LADO branch against its acceptance criteria, AGENTS.md and the long-term architecture, read-only, and gives a merge verdict.
 skills:
   - lado-checks
-  - requesting-code-review
   - critique-affordance
   - critique-color
   - critique-composition
@@ -29,13 +28,11 @@ review and when it is done; this role says how.
    gives you the branch and a range `BASE..HEAD`. Review the diff of that range and the
    commits in it.
 2. Read AGENTS.md: Testing, Design principles, Rules (including clean-room).
-3. Run `make check` on the branch (see `lado-checks`) once and write its result in your
-   review with the full SHA of the commit it ran on; the merge step relies on it. On a
-   re-review, keep that result (and say so) only when every path in
-   `git diff --name-only <that commit> HEAD` is a non-code path as `lado-checks` defines
-   it; otherwise run it again. Do not rerun `make test-live` when the developer's
-   report shows it green on the commit you review. Note any uncommitted changes in the
-   worker's tree.
+3. Run the checks on the branch as `lado-checks`, "Run as little as proves the claim",
+   says for a reviewer, and write the `make check` result in your review with the full
+   SHA of the commit it ran on; the merge step relies on it. On a re-review, say whether
+   you kept that result or ran it again. Note any uncommitted changes in the worker's
+   tree.
 
 Done when: you have the diff, the check result and the tree state.
 

@@ -7,15 +7,18 @@ start: implement
 states:
   implement:
     agent: developer
+    needs: [implement]
     do: |
       Implement the task in the run's worktree, test-first, as your role describes. On a
-      later visit the note says what to fix: review findings, a conflict with main (merge
-      main into the run's branch and resolve it) or a red `make check`.
+      later visit your previous report is the note from implement, and the previous step's
+      note says what to fix: review findings, a conflict with main (merge main into the
+      run's branch and resolve it) or a red `make check`.
       Add a BACKLOG.md entry for each **Found on the way** item in the note and for what
       you find yourself outside the task (`lado-checks`).
-      Run `make check` after your last change and commit on the run's branch.
+      After your last change run `make check`, or only `make lint` for a change only to
+      non-code paths (`lado-checks`), and commit on the run's branch.
       Done when every AC about behaviour is covered by a test you saw fail and then pass,
-      `make check` is green and the work is committed. Report `done`: note_summary is your
+      that check is green and the work is committed. Report `done`: note_summary is your
       status and a one-line result; note_body is your full report, and starts with every
       AC, written out in full, with its status and the test or command that shows it.
     outcomes: {done: review}
@@ -38,35 +41,17 @@ states:
     outcomes: {approved: merge_ok, changes: implement}
   merge_ok:
     gate: approval
+    needs: [implement]
     ask: Merge?
     outcomes: {approved: merge, rejected: implement}
   merge:
     agent: supervisor
     do: |
-      Record what the review found on the way, then check the branch together with the
-      current main before main moves:
-      1. For each **Found on the way** item in the review in the note, add a BACKLOG.md
-         entry (`lado-checks`) in the run's worktree and commit it on the run's branch.
-      2. In the run's worktree, note `git rev-parse HEAD`, then `git merge main`. If it
-         conflicts, `git merge --abort` and report `conflict`, with the conflicting files
-         in the note.
-      3. Skip `make check` only when both hold (`lado-checks`, "Run as little as proves
-         the claim"): `git rev-parse HEAD` is the same as before the merge (it brought
-         nothing; "Already up to date" is only a hint), and the review in the note names
-         the commit its green `make check` ran on and `git log --name-only <that
-         commit>..HEAD` shows only non-code paths (such as your BACKLOG.md commit). Then
-         say in the note which commit's check stands. Otherwise run
-         `make check > <log file> 2>&1` in the run's worktree, with the log outside the
-         tree, and take its exit status; then show the log's last lines. Never pipe
-         `make check` (`| tail` hides a red exit status). If it is red, report `red`, with
-         the failing output in the note.
-      4. In your repo, on main, `git merge --ff-only <the run's branch>`. If main moved in
-         the meantime and that fails, start again at 2.
-      Done when each item found on the way has its entry, main is at the run's branch and
-      the code that lands has a green `make check`: yours, or the reviewer's when step 3
-      let you skip it. Report
-      `merged`; LADO then ends the run, closes its workers and removes its worktree and
-      branch.
+      Follow `lado-checks`, section "Merging a run's branch", with the approving review in
+      the note: record its **Found on the way** items, merge main in, check, fast-forward
+      main. Done when main is at the run's branch with a green check: report `merged`, and
+      LADO ends the run. Report `conflict` if merging main conflicts, `red` if `make check`
+      is red.
     outcomes: {merged: done, conflict: implement, red: implement}
   done:
     end: true
