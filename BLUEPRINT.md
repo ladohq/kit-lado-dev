@@ -155,7 +155,7 @@ Reverse check:
 
 ## 4. Complexity budget
 
-Output of the budget script for 0.10.1.
+Output of the budget script for 0.10.2.
 
 | Measure | Value | Zone | Reason, when not green |
 |---|---|---|---|

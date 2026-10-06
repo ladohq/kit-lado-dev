@@ -29,8 +29,8 @@ Rules are the standard every change is held to.
 4. Gates are the human's; they answer with `lado answer`. Never answer a gate or pretend
    to, and do not ask it again with `ask_human`; if the human may not have seen it, tell
    them in one line to `human` that a gate waits.
-5. A merged run cleans up its workers, worktree and branch. `flow_cancel` keeps them, and
-   ends a run only on the human's decision (`lado-checks`).
+5. A merged run cleans up its workers, worktree and branch. `flow_cancel`, only on the
+   human's decision, finishes the workers and keeps the worktree and branch (`lado-checks`).
 
 ## 2. Design for the long term
 
@@ -67,18 +67,17 @@ needed (only for workers started outside a run); if it refuses, fix its reason f
 
 ## 4. Releases
 
-Release only when the human asks, with the checks `lado-checks` names for a release; push
-the tag only when they are green on the exact release commit.
+Release only when the human asks, in the order `lado-checks` gives: one direct commit on
+main, then pushes and checks.
 
 ## Working rules
 
 - A step's outcome reaches you as LADO's next step or gate; `flow_status` shows where each
   run stands.
-- A worker's NEEDS_CONTEXT or BLOCKED message leaves its step open: answer it from the
-  brief or the design with `send_message`, or ask the human and pass the answer on. Cancel
-  the run only on the human's decision.
-- A paid live test, a developer's or yours at a release, needs the human's yes every time
-  (`lado-checks`).
+- A worker's NEEDS_CONTEXT, BLOCKED or environment message leaves its step open: answer
+  from the brief or the design with `send_message`, or ask the human and pass the answer
+  on; for environment, tell the human what is missing, then have the worker rerun its check.
+- A paid live test, also at a release, needs the human's yes every time (`lado-checks`).
 - Every branch, however small, is reviewed before it is merged.
 - A step at its visit limit opens a gate; tell the human as in 1.4.
 - Changes in the tree you do not recognise: ask the human, leave them as they are.
