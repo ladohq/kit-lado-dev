@@ -21,10 +21,15 @@ Rules are the standard every change is held to.
    review can finish.
 2. The task you pass is the brief every agent in the run gets (`writing-for-agents`): goal,
    files to read, numbered ACs (`feature` adds them in its design step), the seams under
-   test, how to check (`lado-checks`) and what is out of scope. A task over about 30
-   lines goes into an uncommitted file such as `.lado/briefs/<task>.md`, and the task
-   names its absolute path.
-3. Report each of your steps with `flow_advance`. When a step needs a worker, LADO says
+   test, how to check (`lado-checks`) and what is out of scope. A brief over about 30
+   lines is an artifact, not a file: write it with `write_artifact` as a session artifact
+   (e.g. `brief-<task>`) before `flow_start`, or as `<run>/brief` once the run is open, and
+   the task names it and says to read it with `read_artifact`.
+3. Report each of your steps with `flow_advance`. A step's result is an artifact of the
+   run, written with `write_artifact` under the name the step `produces`; you name a run's
+   artifacts in full, `<run>/<name>` (e.g. `<run>/design`), and read the ones a step reads
+   with `read_artifact`. The note is short: the verdict, what changed, the questions for
+   the human, or that there are none. When a step needs a worker, LADO says
    so: start it with `spawn_worker(role=..., run=...)`, also the checker for `verify`.
 4. Gates are the human's; they answer with `lado answer`. Never answer a gate or pretend
    to, and do not ask it again with `ask_human`; if the human may not have seen it, tell
@@ -45,14 +50,17 @@ A task is not done when its ACs pass but the next stage has to undo it. In every
    AGENTS.md's Design principles.
 
 Done when the design names the root cause, the options with their cost, the recommended
-one and how it fits the coming stages. The design is the developer's brief and reaches
-everyone as it is, so it stands alone (no "see the chat").
+one and how it fits the coming stages. The design, the run's `<run>/design` artifact, is
+the developer's brief and reaches everyone as it is, so it stands alone (no "see the
+chat").
 
-A UI design starts from `docs/design/ui.md`. Show the human mockups:
-static, self-contained HTML pages, never committed, for example in `.lado/mockups/<run>/`.
-Give the local path; publish a page only when the human agrees. The design names the
-approved mockups' absolute path and what to change in `docs/design/ui.md`; the developer
-makes that change on the run's branch.
+A UI design starts from `docs/design/ui.md`. Show the human mockups: static,
+self-contained HTML pages, each an HTML artifact of the run written with `write_artifact`
+(e.g. `<run>/mockup-tab.html`), never committed and never a local path; the human opens
+them in LADO's UI. Publish a page elsewhere only when the human agrees. Attach a mockup
+with `artifacts` when it exists (to `ask_human`, a message or your `flow_advance`); it is
+never in the flow's `produces`. The design names the approved mockups' artifacts and what
+to change in `docs/design/ui.md`; the developer makes that change on the run's branch.
 
 Ask the human's decisions in `grilling` rounds as the `feature` design step says.
 

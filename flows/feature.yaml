@@ -8,7 +8,7 @@ start: design
 states:
   design:
     agent: supervisor
-    needs: [design]
+    produces: [design]
     do: |
       Design the change with the human, in the chat, for the long term (your role, section
       "Design for the long term").
@@ -21,7 +21,9 @@ states:
          acceptance criteria (AC-1, AC-2, ...), each a fact a reviewer can check from the
          diff or a command's output. Bugs and debt
          you found outside the task go in its last section, **Found on the way**
-         (`lado-checks`): the developer records them.
+         (`lado-checks`): the developer records them. Write it with `write_artifact` as
+         `<run>/design` (the run's name for `<run>`): the architect, the human at
+         `design_ok`, the developer and the reviewer read it there.
       Ask the human's decisions, yours and the architect's "Questions for the human",
       before you write the design or revise it, in `grilling` rounds: numbered questions,
       each with its context and your recommended answer (the architect's, or yours if you
@@ -29,84 +31,101 @@ states:
       round, the body holds the questions, one reply answers them), or as one `ask_human`
       per question when each has clear options (your recommendation first, the context in
       `details`). Write the answers into the design.
-      On a later visit your previous design is the note from design (on the first visit
-      there is no note yet): revise that text, not one from memory. The previous step's
-      note holds the architect's findings or the human's answer. Address each finding in
-      the design, or say in it why not, and copy the architect's **Found on the way** items
-      into the design's section, so none is lost.
-      Done when the design answers every open question. Report `ready` with the design's
-      one-line summary in note_summary and in note_body the whole design, ACs included.
+      On a later visit your previous design is your `design` artifact (`<run>/design`; on
+      the first visit there is none yet): read it with `read_artifact` and revise that
+      text, not one from memory. The previous step's note holds the architect's verdict and
+      questions, or the human's answer; the architect's findings are its
+      `<run>/architecture-review` artifact. Address each finding in the design, or say in
+      it why not, and copy the architect's **Found on the way** items into the design's
+      section, so none is lost.
+      Done when the design answers every open question and `<run>/design` holds it. Report
+      `ready`: note_summary is the design's one-line summary; note_body is short: what
+      changed since the last visit and which questions the human answered (on the first
+      visit, that it is the first version).
     outcomes: {ready: architecture}
   architecture:
     agent: architect
     max_visits: 3
-    needs: [design, architecture]
+    reads: [design]
+    produces: [architecture-review]
     do: |
-      Review the design (the note from design), read-only, as your role describes: against
-      ROADMAP.md, AGENTS.md's Design principles, the code it touches and simpler
-      alternatives.
-      On a later visit, your previous review is the note from architecture: mark each of
-      its findings RESOLVED or STILL OPEN first.
-      Done when every point of your review has a verdict with its evidence. Report
-      `approved` when no Critical or Important finding and no question for the human is
-      left, otherwise `changes`, with the note your role describes.
+      Review the design (your `design` input; read it with `read_artifact`), read-only, as
+      your role describes: against ROADMAP.md, AGENTS.md's Design principles, the code it
+      touches and simpler alternatives.
+      On a later visit your previous review is your `architecture-review` artifact: mark
+      each of its findings RESOLVED or STILL OPEN first.
+      Done when every point of your review has a verdict with its evidence and the review
+      is written with `write_artifact` as `architecture-review`. Report `approved` when no
+      Critical or Important finding and no question for the human is left, otherwise
+      `changes`, with the note your role describes: the verdict and the counts in
+      note_summary, the **Questions for the human** (or that there are none) in note_body.
     outcomes: {approved: design_ok, changes: design}
   design_ok:
     gate: approval
-    needs: [design]
+    reads: [design]
     ask: Approve the design?
     outcomes: {approved: implement, rejected: design}
   implement:
     agent: developer
-    needs: [design, implement, verify]
+    reads: [design, verify]
+    produces: [report]
     do: |
-      Implement the design (the note from design, as the human approved it) in the run's
-      worktree, test-first, as your role describes. The architect's review comes with the
-      human's answer in the previous step's note on the first visit; its Minor findings are
-      advice: apply one only if it changes no AC or decision of the approved design, and
-      list the ones you applied and skipped in your report. On a later visit your previous
-      report is the note from implement, and the previous step's note says what to fix:
-      review findings, a conflict with main or a red check from verify (for a conflict,
-      merge main into the run's branch and resolve it), or the human's reason for rejecting
-      the merge (quote it at the top of your report).
+      Implement the design (your `design` input, as the human approved it; read it with
+      `read_artifact`) in the run's worktree, test-first, as your role describes. On the
+      first visit the previous step's note is the human's answer at `design_ok`; the
+      architect's last review is the run's `architecture-review` artifact, and its Minor
+      findings are advice: apply one only if it changes no AC or decision of the approved
+      design, and list the ones you applied and skipped in your report. On a later visit
+      your previous report is your `report` artifact, and the previous step's note says
+      what to fix: review findings (the `review` artifact), a conflict with main or a red
+      check from verify (your `verify` input; for a conflict, merge main into the run's
+      branch and resolve it), or the human's reason for rejecting the merge (quote it at
+      the top of your report).
       Done when every AC about behaviour is covered by a test you saw fail and then pass,
       each **Found on the way** item has its BACKLOG.md entry (your role, section 4), the
-      checks your role (section 5) names are green and the work is committed on the
-      run's branch. Report `done`: note_summary is your status and a one-line result;
-      note_body is your full report (your role, section 5), and starts with every AC,
-      written out in full, with its status and the test or command that shows it.
+      checks your role (section 5) names are green, the work is committed on the run's
+      branch and your full report (your role, section 5) is written with `write_artifact`
+      as `report`, starting with every AC, written out in full, with its status and the
+      test or command that shows it. Report `done`: note_summary is your status and a
+      one-line result; note_body is short: what changed since the last visit, your
+      concerns and questions for the human, or that there are none.
     outcomes: {done: review}
   review:
     agent: reviewer
     max_visits: 3
-    needs: [design, review]
+    reads: [design, report]
+    produces: [review]
     do: |
       Review the run's branch against main, read-only, as your role describes: the diff is
       `git diff main...HEAD` in the run's worktree. The ACs are those of the approved design
-      (the note from design); the developer's report in the previous step's note starts
-      with its status for each. Check each AC of the design against the diff, not only the
-      ones the report lists, and a quoted rejection of the merge like an AC.
-      On a later visit, your previous review is the note from review: mark each of its
+      (your `design` input); the developer's `report` input starts with its status for
+      each. Read both with `read_artifact`. Check each AC of the design against the diff,
+      not only the ones the report lists, and a quoted rejection of the merge like an AC.
+      On a later visit your previous review is your `review` artifact: mark each of its
       findings RESOLVED or STILL OPEN first.
-      Done when every AC has a verdict and every finding its evidence. Report `approved`
-      for "Ready to merge: Yes", otherwise `changes`, as your role, section 4, says.
+      Done when every AC has a verdict, every finding its evidence and the review is
+      written with `write_artifact` as `review`. Report `approved` for "Ready to merge:
+      Yes", otherwise `changes`, as your role, section 4, says.
     outcomes: {approved: verify, changes: implement}
   verify:
     agent: checker
-    needs: [verify]
+    produces: [verify]
     do: |
-      Check the branch as your role describes.
+      Check the branch as your role describes, and write the commit you checked, each
+      command with its result and **Found on the way** with `write_artifact` as `verify`.
+      On a later visit your previous results are your `verify` artifact.
     outcomes: {green: merge_ok, red: implement, conflict: implement}
   merge_ok:
     gate: approval
-    needs: [implement, verify]
+    reads: [report, verify]
     ask: Merge?
     outcomes: {approved: merge, rejected: implement}
   merge:
     agent: supervisor
-    needs: [review, verify]
+    reads: [review, verify]
     do: |
-      Follow `lado-checks`, "Merging a run's branch".
+      Follow `lado-checks`, "Merging a run's branch": the **Found on the way** items are in
+      `<run>/review` and `<run>/verify`; read them with `read_artifact`.
     outcomes: {merged: done, stale: verify}
   done:
     end: true

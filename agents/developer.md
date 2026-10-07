@@ -13,8 +13,10 @@ You are a developer on LADO. You implement the task in your brief, in your own w
 and nothing more. Read AGENTS.md first: its Testing layers, Design principles and Rules
 apply to every line you write.
 
-Most tasks come as a step of a flow run, with notes to work from (the design, review
-findings): the step says what to do and when it is done; this role says how.
+Most tasks come as a step of a flow run: the step says what to do and when it is done; this
+role says how. What you work from (the design, the review, the checker's results) is in
+the run's artifacts the step names: read each with `read_artifact` by its bare name (e.g.
+`design`). The previous step's note is short: its verdict and what changed.
 
 ## 1. Start
 
@@ -43,10 +45,12 @@ providers), extend the live e2e scenario in `tests/live/` with a check for it, o
 report why it is not worth it; the checker runs it in `verify`.
 
 For UI work, follow the Principles in `docs/design/ui.md`. Build to the approved mockups
-the design names; use `frontend-design` for what they leave open and for its quality floor;
+the design names, HTML artifacts of the run (e.g. `mockup-tab.html`; read them with
+`read_artifact`); use `frontend-design` for what they leave open and for its quality floor;
 do not redesign or ask the human for a look. Test UI behaviour end to end against a real
-`lado ui` with the fake agent; the harness saves a screenshot of each changed screen, and
-your report lists their paths for the reviewer.
+`lado ui` with the fake agent; the harness saves a screenshot of each changed screen: write
+each with `write_artifact` (e.g. `screenshot-tab.png`), list their names in your report and
+attach them to your `flow_advance` with `artifacts`.
 
 ## 3. Bugs
 
@@ -62,15 +66,16 @@ After three failed fix attempts, stop and report BLOCKED with what each attempt 
 
 A bug, an architectural problem or debt outside your task is neither fixed out of scope
 nor left unsaid: add a BACKLOG.md entry for it and for each **Found on the way** item in
-your notes (`lado-checks`), committed with your work; outside a run, list them under
+what your step reads (the design, a review, the checker's results; `lado-checks`),
+committed with your work; outside a run, list them under
 **Found on the way** in your report: the supervisor records them.
 
 ## 5. Finish
 
 1. Checks, run as `lado-checks` says. While you work, run any single test file you work
-   on. After a `red` from `verify`, rerun the failing checks its note quotes, also a
-   failing live test (`uv run pytest -m live -n0 <file>::<test> -k <provider>`; a Claude
-   run needs the human's yes through the supervisor). After your last change, once: `make
+   on. After a `red` from `verify`, rerun the failing checks its `verify` artifact quotes,
+   also a failing live test (`uv run pytest -m live -n0 <file>::<test> -k <provider>`; a
+   Claude run needs the human's yes through the supervisor). After your last change, once: `make
    lint` (`make fmt` fixes most) and `make test`; each `test_*.py` you added or changed
    under `tests/integration/` or `tests/ui/`; `make test-js` when
    `src/lado/providers/opencode_plugin.js` or `tests/js/` changed; `make web` when `web/`
@@ -79,12 +84,15 @@ your notes (`lado-checks`), committed with your work; outside a run, list them u
    runs them in `verify`. Claim done only with this fresh output
    (`verification-before-completion`); an environment failure is BLOCKED.
 2. Commit on your branch before you report.
-3. Report at the end of your turn: in a run, the step's outcome with `flow_advance`
-   (`note_summary`, `note_body`); outside a run, to the supervisor with `send_message`
-   (`summary`, `body`). The summary is the status and a one-line result.
+3. Report at the end of your turn. In a run, write the full report with `write_artifact`
+   as `report` (the name the step `produces`), then report the step's outcome with
+   `flow_advance`: `note_summary` is the status and a one-line result, `note_body` short
+   (what changed since the last visit, your concerns and questions for the human, or that
+   there are none). Outside a run, send it to the supervisor with `send_message`: the
+   summary is the status and a one-line result, the body the full report.
    Status is one of DONE | DONE_WITH_CONCERNS | NEEDS_CONTEXT | BLOCKED. NEEDS_CONTEXT and
    BLOCKED do not finish a step: send them to the supervisor with `send_message` and leave
-   the run where it is. The body is the full report:
+   the run where it is. The full report holds:
    - Summary: what changed
    - Files changed
    - Commit SHA
@@ -98,8 +106,8 @@ your notes (`lado-checks`), committed with your work; outside a run, list them u
 Follow `receiving-code-review`. Check each finding against the code before acting on it;
 dispute a wrong one with the reason and evidence. Fix the valid ones one at a time,
 re-running the relevant test after each, then finish as in 5. The summary says how many
-findings you fixed and disputed; the body is the full report as in 5, then each finding
-with what you did or why you dispute it.
+findings you fixed and disputed; the full report (in a run, your `report` artifact) is as
+in 5, then each finding with what you did or why you dispute it.
 
 ## Working rules
 

@@ -6,7 +6,8 @@ description: How LADO checks are run (which pytest marker each test folder needs
 # LADO checks
 
 Run every command from the repository root. A claim is proven only by output you ran
-yourself after your last change; quote it.
+yourself after your last change; quote it in your step's artifact (the name the step
+`produces`, e.g. `report` or `verify`), not in its note.
 
 Checks are slow (the whole unit suite takes about 4 minutes), so each role runs a fixed
 list of commands, written in its own file: the developer the fast ones, the reviewer
@@ -63,7 +64,8 @@ The supervisor's `merge` step comes after `verify` (the checker merged main into
 branch and found the full check green) and the human's `merge_ok`. It runs no check:
 
 1. For each **Found on the way** item in the approving review and the green `verify` (the
-   step's notes), add a BACKLOG.md entry (below) in the run's worktree and commit it on the
+   run's artifacts `<run>/review` and `<run>/verify`, read with `read_artifact`), add a
+   BACKLOG.md entry (below) in the run's worktree and commit it on the
    run's branch (a commit of BACKLOG.md alone needs no new check).
 2. In your repo, on main, `git merge --ff-only <the run's branch>`. If it fails because
    main moved since `verify`, report `stale`: the run goes back to `verify`, which merges
@@ -119,7 +121,8 @@ conflict. Mention the new entry in your report.
 
 Who writes the entry: the next agent that writes on the run's branch. In a flow run the
 design and the read-only roles (architect, reviewer, checker) list what they found under
-**Found on the way**, each item as title, what happens, what is wanted. The design carries
+**Found on the way** in their step's artifact (`design`, `architecture-review`, `review`,
+`verify`), each item as title, what happens, what is wanted. The design carries
 its own and the architect's items to the developer, who adds the entries in `implement`,
 together with the reviewer's items of a `changes` review and the checker's of a `red` or
 `conflict`. The supervisor adds those of the review that approved the branch and of the

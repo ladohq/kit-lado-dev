@@ -8,50 +8,59 @@ start: implement
 states:
   implement:
     agent: developer
-    needs: [implement, verify]
+    reads: [verify]
+    produces: [report]
     do: |
       Implement the task in the run's worktree, test-first, as your role describes. On a
-      later visit your previous report is the note from implement, and the previous step's
-      note says what to fix: review findings, a conflict with main or a red check from
-      verify (for a conflict, merge main into the run's branch and resolve it), or the
-      human's reason for rejecting the merge (quote it at the top of your report).
+      later visit your previous report is your `report` artifact, and the previous step's
+      note says what to fix: review findings (the `review` artifact), a conflict with main
+      or a red check from verify (your `verify` input; for a conflict, merge main into the
+      run's branch and resolve it), or the human's reason for rejecting the merge (quote it
+      at the top of your report).
       Done when every AC about behaviour is covered by a test you saw fail and then pass,
       each **Found on the way** item has its BACKLOG.md entry (your role, section 4), the
-      checks your role (section 5) names are green and the work is committed on the
-      run's branch. Report `done`: note_summary is your status and a one-line result;
-      note_body is your full report (your role, section 5), and starts with every AC,
-      written out in full, with its status and the test or command that shows it.
+      checks your role (section 5) names are green, the work is committed on the run's
+      branch and your full report (your role, section 5) is written with `write_artifact`
+      as `report`, starting with every AC, written out in full, with its status and the
+      test or command that shows it. Report `done`: note_summary is your status and a
+      one-line result; note_body is short: what changed since the last visit, your
+      concerns and questions for the human, or that there are none.
     outcomes: {done: review}
   review:
     agent: reviewer
     max_visits: 3
-    needs: [review]
+    reads: [report]
+    produces: [review]
     do: |
       Review the run's branch against main, read-only, as your role describes: the diff is
-      `git diff main...HEAD` in the run's worktree. The ACs are in the task; the developer's
-      report in the previous step's note starts with its status for each. Check each
-      against the diff, and a quoted rejection of the merge like an AC.
-      On a later visit, your previous review is the note from review: mark each of its
+      `git diff main...HEAD` in the run's worktree. The ACs are in the task; the
+      developer's `report` input (read it with `read_artifact`) starts with its status for
+      each. Check each against the diff, and a quoted rejection of the merge like an AC.
+      On a later visit your previous review is your `review` artifact: mark each of its
       findings RESOLVED or STILL OPEN first.
-      Done when every AC has a verdict and every finding its evidence. Report `approved`
-      for "Ready to merge: Yes", otherwise `changes`, as your role, section 4, says.
+      Done when every AC has a verdict, every finding its evidence and the review is
+      written with `write_artifact` as `review`. Report `approved` for "Ready to merge:
+      Yes", otherwise `changes`, as your role, section 4, says.
     outcomes: {approved: verify, changes: implement}
   verify:
     agent: checker
-    needs: [verify]
+    produces: [verify]
     do: |
-      Check the branch as your role describes.
+      Check the branch as your role describes, and write the commit you checked, each
+      command with its result and **Found on the way** with `write_artifact` as `verify`.
+      On a later visit your previous results are your `verify` artifact.
     outcomes: {green: merge_ok, red: implement, conflict: implement}
   merge_ok:
     gate: approval
-    needs: [implement, verify]
+    reads: [report, verify]
     ask: Merge?
     outcomes: {approved: merge, rejected: implement}
   merge:
     agent: supervisor
-    needs: [review, verify]
+    reads: [review, verify]
     do: |
-      Follow `lado-checks`, "Merging a run's branch".
+      Follow `lado-checks`, "Merging a run's branch": the **Found on the way** items are in
+      `<run>/review` and `<run>/verify`; read them with `read_artifact`.
     outcomes: {merged: done, stale: verify}
   done:
     end: true

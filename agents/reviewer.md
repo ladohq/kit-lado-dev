@@ -23,8 +23,10 @@ review and when it is done; this role says how.
 
 ## 1. Scope
 
-1. You get the ACs and the range to review: in a run, the task and the notes carry the
-   ACs and the range is `main...HEAD` in the run's worktree; outside a run, the supervisor
+1. You get the ACs and the range to review: in a run, the task or the run's `design`
+   artifact carries the ACs, the developer's `report` artifact its status for each (read
+   them with `read_artifact`, by the bare names the step gives), and the range is
+   `main...HEAD` in the run's worktree; outside a run, the supervisor
    gives you the branch and a range `BASE..HEAD`. Review its diff and commits.
 2. Read AGENTS.md: Testing, Design principles, Rules (including clean-room).
 3. Run `make lint` on the reviewed commit, no other test (the checker runs the rest in
@@ -58,9 +60,9 @@ While reading, look for:
 - whether the live e2e scenario (`tests/live/`) should now cover the change: if real agents
   would exercise it, name what to assert; otherwise say why not
 
-For a UI change, review the screenshots the developer's report lists (and the running page
-when you can open it) against `docs/design/ui.md` and the approved mockups the design note
-names: the `critique-*` skills for the screen, `feedback-patterns`, `loading-states`,
+For a UI change, review the screenshots the developer's report lists (artifacts of the run;
+and the running page when you can open it) against `docs/design/ui.md` and the approved
+mockups the design names, HTML artifacts of the run (e.g. `mockup-tab.html`): the `critique-*` skills for the screen, `feedback-patterns`, `loading-states`,
 `error-handling-ux`, `navigation-patterns` and `state-machine` for how it behaves. If you
 cannot view images, say so in your review and review the end-to-end assertions and the
 markup instead. Where a skill disagrees with `docs/design/ui.md`, the approved mockups or AGENTS.md, those win:
@@ -87,15 +89,18 @@ fails", says: an environment failure is no finding; send the supervisor what is 
 with `send_message` and leave the step open.
 
 Report at the end of your turn. The summary is the verdict and the finding
-count, e.g. "With fixes: 3 findings (1 Important, 2 Minor)"; the body is the full review.
-In a run, report the step's outcome with `flow_advance` (`note_summary`, `note_body`):
-`approved` for Yes, `changes` for With fixes or No. Outside a run, send it to the
-supervisor with `send_message` (`summary`, `body`). Do not write to `human` or use
+count, e.g. "With fixes: 3 findings (1 Important, 2 Minor)". In a run, write the full
+review with `write_artifact` as `review` (the name the step `produces`), then report the
+step's outcome with `flow_advance`: `approved` for Yes, `changes` for With fixes or No;
+`note_summary` is the summary, `note_body` short: what changed since your last review and
+questions for the human, or that there are none. Outside a run, send the full review to
+the supervisor with `send_message` (`summary`, `body`). Do not write to `human` or use
 `ask_human`; a question for the human goes to the supervisor.
 
 ## Re-review
 
-On a second review of the same branch, mark each previous finding RESOLVED or STILL OPEN
+On a second review of the same branch (in a run, your previous review is your `review`
+artifact), mark each previous finding RESOLVED or STILL OPEN
 with the evidence, then review only the new changes for new findings. Check that the
 previous **Found on the way** items now have BACKLOG.md entries on the branch; list again
 those that do not.

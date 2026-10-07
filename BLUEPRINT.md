@@ -9,7 +9,8 @@ session started in the LADO repository.
 ## 1. Requirements
 
 Restored in 0.10.0 from the kit's README, roles and flows; R8 and R9 were made precise in
-the triage of run `improve/lado-dev` (2026-10-06).
+the triage of run `improve/lado-dev` (2026-10-06); R12 added in 0.12.0 (LADO 0.27's
+artifacts contract).
 
 - **R1** Every change is designed for the long term: root cause, 2–3 options with their
   cost, held against ROADMAP.md and AGENTS.md. *Source:* `agents/supervisor.md` §2.
@@ -52,6 +53,15 @@ the triage of run `improve/lado-dev` (2026-10-06).
   `agents/reviewer.md` §2.
 - **R11** Clean-room: LADO borrows ideas, never code. *Source:* `skills/lado-checks`
   "Clean-room".
+- **R12** Every step's result is an artifact the human can read remotely; each flow names
+  it with `produces` and its inputs with `reads`. A role writes its step's result with
+  `write_artifact` under the `produces` name and reads its inputs with `read_artifact`; the
+  note is short (verdict, what changed, questions for the human or that there are none);
+  something optional (a mockup, a screenshot) is attached only when it exists, never in
+  `produces`. Mockups and long briefs are artifacts, not local paths. *Source:*
+  `flows/feature.yaml`, `flows/fix.yaml` (`produces`, `reads`); every role file;
+  `agents/supervisor.md` §1–§2; `skills/lado-checks`; LADO's
+  `.lado/briefs/kits-artifacts.md` ("Artifact or note"), 2026-10-08.
 
 ## 2. Starting point
 
@@ -64,7 +74,8 @@ Archetype "Feature with design gate", with three changes:
   once (R8), so neither the developer nor the reviewer runs them and the human's merge
   gate sees a green full check.
 
-Flow skeletons, as LADO runs them (added in 0.10.2; `verify` added in 0.11.0):
+Flow skeletons, as LADO runs them (added in 0.10.2; `verify` added in 0.11.0; `produces`
+and `reads` in 0.12.0, R12):
 
 ```yaml
 name: feature
@@ -72,29 +83,40 @@ start: design
 states:
   design:
     agent: supervisor
+    produces: [design]
     outcomes: {ready: architecture}
   architecture:
     agent: architect
     max_visits: 3
+    reads: [design]
+    produces: [architecture-review]
     outcomes: {approved: design_ok, changes: design}
   design_ok:
     gate: approval
+    reads: [design]
     outcomes: {approved: implement, rejected: design}
   implement:
     agent: developer
+    reads: [design, verify]
+    produces: [report]
     outcomes: {done: review}
   review:
     agent: reviewer
     max_visits: 3
+    reads: [design, report]
+    produces: [review]
     outcomes: {approved: verify, changes: implement}
   verify:
     agent: checker
+    produces: [verify]
     outcomes: {green: merge_ok, red: implement, conflict: implement}
   merge_ok:
     gate: approval
+    reads: [report, verify]
     outcomes: {approved: merge, rejected: implement}
   merge:
     agent: supervisor
+    reads: [review, verify]
     outcomes: {merged: done, stale: verify}
   done:
     end: true
@@ -108,19 +130,26 @@ start: implement
 states:
   implement:
     agent: developer
+    reads: [verify]
+    produces: [report]
     outcomes: {done: review}
   review:
     agent: reviewer
     max_visits: 3
+    reads: [report]
+    produces: [review]
     outcomes: {approved: verify, changes: implement}
   verify:
     agent: checker
+    produces: [verify]
     outcomes: {green: merge_ok, red: implement, conflict: implement}
   merge_ok:
     gate: approval
+    reads: [report, verify]
     outcomes: {approved: merge, rejected: implement}
   merge:
     agent: supervisor
+    reads: [review, verify]
     outcomes: {merged: done, stale: verify}
   done:
     end: true
@@ -132,12 +161,12 @@ states:
 
 | Element | Kind | Covers | Why it exists / why nothing simpler |
 |---|---|---|---|
-| `supervisor` | role (lead) | R1, R3, R9 | Designs with the human, delegates, merges. |
-| `architect` | role | R2 | Read-only design review; the supervisor cannot review its own design. |
-| `developer` | role | R4, R7, R8, R10 | Writes the code; one author per run; runs the fast checks. |
-| `reviewer` | role | R5, R8, R10 | Read-only, independent of the developer; runs `make lint` only. |
-| `checker` | role | R8 | Runs the slow checks once, read-only for code (a clean merge of main is its only write). The developer cannot: the check must run on the branch merged with the main of that moment, after review; the supervisor could, but its turn would block the human's chat for the length of `make check`. |
-| `feature` | flow | R1–R5, R8 | A change that needs a design. |
+| `supervisor` | role (lead) | R1, R3, R9, R12 | Designs with the human, delegates, merges. |
+| `architect` | role | R2, R12 | Read-only design review; the supervisor cannot review its own design. |
+| `developer` | role | R4, R7, R8, R10, R12 | Writes the code; one author per run; runs the fast checks. |
+| `reviewer` | role | R5, R8, R10, R12 | Read-only, independent of the developer; runs `make lint` only. |
+| `checker` | role | R8, R12 | Runs the slow checks once, read-only for code (a clean merge of main is its only write in the repository). The developer cannot: the check must run on the branch merged with the main of that moment, after review; the supervisor could, but its turn would block the human's chat for the length of `make check`. |
+| `feature` | flow | R1–R5, R8, R12 | A change that needs a design. |
 | `feature.design` | work step | R1 | The design with the human. |
 | `feature.architecture` | work step | R2 | Independent design review, `max_visits: 3`. |
 | `feature.design_ok` | gate | R3 | What to build is the human's call. |
@@ -146,9 +175,9 @@ states:
 | `feature.verify` | work step | R8 | The only `make check` and live tests, on the branch merged with main; red or conflict goes back to `implement`. |
 | `feature.merge_ok` | gate | R3 | Merging into main is hard to undo; the human sees a green full check. |
 | `feature.merge` | work step | R7, R8 | BACKLOG.md entries, then `--ff-only`; no check; `stale` goes back to `verify`. |
-| `fix` | flow | R5, R6, R8 | The same as `feature` without design and architecture. |
+| `fix` | flow | R5, R6, R8, R12 | The same as `feature` without design and architecture. |
 | `fix.implement`, `fix.review`, `fix.verify`, `fix.merge_ok`, `fix.merge` | steps, gate | as in `feature` | |
-| `lado-checks` | own skill | R7, R8, R9, R11 | One place for how to run and read checks, merging, releasing, BACKLOG.md and clean-room; the commands each role runs are in that role's file only. |
+| `lado-checks` | own skill | R7, R8, R9, R11, R12 | One place for how to run and read checks, merging, releasing, BACKLOG.md and clean-room; the commands each role runs are in that role's file only. |
 | `grilling`, `writing-for-agents` | skills (supervisor) | R1, R3 | Rounds of the human's decisions; briefs for agents. |
 | `codebase-design` | skill (architect) | R2 | Vocabulary for module boundaries. |
 | `tdd`, `diagnosing-bugs`, `verification-before-completion`, `receiving-code-review` | skills (developer) | R4, R5 | Test-first, bug diagnosis, evidence before done, handling review findings. |
@@ -173,10 +202,11 @@ Reverse check:
 - R9: supervisor §4, `lado-checks`.
 - R10: developer, reviewer, `frontend-design`, the UI review skills.
 - R11: `lado-checks`.
+- R12: every role, `lado-checks`, the `produces` and `reads` of every state of both flows.
 
 ## 4. Complexity budget
 
-Output of the budget script for 0.11.0.
+Output of the budget script for 0.12.0.
 
 | Measure | Value | Zone | Reason, when not green |
 |---|---|---|---|
@@ -185,16 +215,17 @@ Output of the budget script for 0.11.0.
 | Work steps in `fix` | 4 | green | |
 | Gates in `feature` | 2 | green | |
 | Gates in `fix` | 1 | green | |
-| Words in the longest role prompt | 919 (developer) | yellow | The human asked for each role's exact commands in its own file (2026-10-07); the developer's list (section 5) is the longest. |
-| Words in the lead's prompt | 819 | green | |
+| Words in the longest role prompt | 1030 (developer) | yellow | The human asked for each role's exact commands in its own file (2026-10-07); the developer's list (section 5) is the longest. 0.12.0 adds where each result goes (R12); the reviewer (868) is yellow for the same reason. |
+| Words in the lead's prompt | 939 | green | |
 | Own skills | 1 | green | |
 | MCP servers | 0 | green | |
-| Similar paragraphs | 3 pairs | yellow | Kept (the human, triage of `improve/lado-dev`): `feature` and `fix` are two flows by design (R2, R6); their `review` and `implement` differ in where the ACs come from (the design note or the task), and each `do` must read on its own. The architect/reviewer openings say the same about runs for two different roles. |
+| Similar paragraphs | 5 pairs | yellow | Kept (the human, triage of `improve/lado-dev`): `feature` and `fix` are two flows by design (R2, R6); their `review` and `implement` differ in where the ACs come from (the `design` artifact or the task), and each `do` must read on its own; since 0.12.0 their `verify` and `merge` name the artifacts they write and read (R12), so they are long enough to count. The architect/reviewer openings say the same about runs for two different roles. |
 
 ## 5. Change log
 
 | Date | Version | Change | ← Fact (session, run, metric or report) |
 |---|---|---|---|
+| 2026-10-08 | 0.12.0 | LADO 0.27's artifacts contract (R12): `needs` replaced by `reads` in both flows and `produces` added (`design`, `architecture-review`, `report`, `review`, `verify`; `merge` produces none); each `do` names the artifacts it writes and reads and says "on a later visit your previous <x> is your `<x>` artifact"; every role writes its result with `write_artifact` and reads its inputs with `read_artifact` (bare names for a run's worker, `<run>/<name>` for the supervisor), keeps the note short and attaches optional outputs (mockups, screenshots) only when they exist; mockups and briefs over about 30 lines are artifacts, not `.lado/mockups`/`.lado/briefs` paths; `lado-checks` quotes output in the step's artifact; `dependencies.lado: ">=0.27"`. Sources of R1–R11 checked: unchanged. | LADO's `.lado/briefs/kits-artifacts.md` (section lado-dev) and `flow-inputs-design.md` ("Артефакт или note"), 2026-10-08; run `fix/kit-artifacts`. |
 | 2026-10-07 | 0.11.1 | Checker: a red `make check` is no longer rerun whole; only what failed is rerun, up to 2 times: a failed make target (`lint`, `test-js`, `web`, `browser`) by itself, each failed pytest group's `FAILED <node id>` tests with the group's `-m` and `-n0`, a collection error or a group without `FAILED` lines (crash, timeout) as its whole command once; in a kit's own repo `lado kits check .` again. Passes on a rerun → flaky under **Found on the way**, outcome `green`; fails all 3 times → code or test, `red`. `lado-checks` "When a check fails" points to the checker's section 2 for the details. | The human, 2026-10-07, after comparing with the tessera reference: rerun only the failed tests (a whole `make check` rerun costs 3–4 min). |
 | 2026-10-07 | 0.11.0 | Test tiers by role: `lado-checks` loses the path table and the import search; each role file lists its exact commands (developer: the test files it works on, then `make lint`, `make test`, the integration/UI files it changed, `make test-js`/`make web` by path, no live, no `make check`; reviewer: `make lint` and the developer's report). New role `checker` and step `verify` between `review` and `merge_ok` in both flows: `git merge main`, `make check` (rerun once when red), the live tests the change needs with the human's yes for a paid run; outcomes `green`/`red`/`conflict`. `merge`: BACKLOG.md entries, `--ff-only`, no check, `stale` → `verify`. `make check` described as three pytest runs one after another, all run, `check: failed: <groups>`. R8 rewritten. | The human's request of 2026-10-07: tests run too often and too slowly; developer fast tests only, reviewer almost none, heavy ones only at the end in a separate role, release as minor 0.11.0; LADO e518427 (`make check` sequential). |
 | 2026-10-07 | 0.10.3 | Release of LADO: live tests of every provider (on a no to Claude, every other one); red CI or live after pushing main → no tag, fix through `fix`, push main again with the same version. Developer: a non-live check that cannot run for an environment cause → BLOCKED. Targeted tests: a changed conftest or helper under `tests/` runs its folder's `test_*.py`; a `web/` file that names no screen runs all of `tests/ui/`; every row that matches a path; more than 10 unit hits counted over both searches. Live tests needed for `providers/`, `hooks.py`, `mcp_server.py`, `runtime.py`, `agent_env.py`, `tests/live/`. Merge Done and a BACKLOG.md-only commit agree. R9 updated. | F3.12–F3.18, F5.11–F5.13, F6.3, F9.1, F10.1 of `kit-reports/lado-dev-0.10.2-2026-10-07.md`; the human (triage of `improve/lado-dev-4`, questions 1–2). |

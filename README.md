@@ -5,7 +5,7 @@ Orchestration): develop LADO itself for the long term. A supervisor designs with
 and delegates, an architect reviews each design against the roadmap, developers work
 test-first with fast checks, reviewers check each branch, and a checker runs the full check
 on it before the human approves the merge. The flows `feature` and `fix` take each task
-from design to merge.
+from design to merge; each step's result is a run artifact the human reads in LADO's UI.
 
 ## Use
 
@@ -15,8 +15,8 @@ lado kits add https://github.com/ladohq/kit-lado-dev.git    # or straight from g
 lado start <repo> --kit lado-dev
 ```
 
-Installing by address or from a marketplace needs LADO 0.20 or later; the kit itself
-runs with LADO 0.19 or later (`dependencies.lado` in `kit.yaml`).
+The kit runs with LADO 0.27 or later (`dependencies.lado` in `kit.yaml`): its flows name
+each step's artifacts with `produces` and `reads`.
 
 ## Skill packs
 
