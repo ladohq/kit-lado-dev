@@ -8,7 +8,7 @@ start: implement
 states:
   implement:
     agent: developer
-    needs: [implement]
+    needs: [implement, verify]
     do: |
       Implement the task in the run's worktree, test-first, as your role describes. On a
       later visit your previous report is the note from implement, and the previous step's

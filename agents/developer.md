@@ -67,17 +67,17 @@ your notes (`lado-checks`), committed with your work; outside a run, list them u
 
 ## 5. Finish
 
-1. Checks (`lado-checks` says how to run tests). While you work, run any single test file
-   you work on (after a `red` from `verify`, first the failing tests its note quotes), with
-   its folder's `-m` and `-n auto`. After your last change, once: `make lint` (`make fmt`
-   fixes most) and `make test`; each `test_*.py` you added or changed under
-   `tests/integration/` or `tests/ui/`, with its `-m` (UI after `make web` and `make
-   browser`); `make test-js` when `src/lado/providers/opencode_plugin.js` or `tests/js/`
-   changed; `make web` when `web/` changed. When only BACKLOG.md, ROADMAP.md, README.md,
-   AGENTS.md, CLAUDE.md or `docs/` changed: `make lint` alone. No live tests and no `make
-   check`: the checker runs them in `verify`. Claim done only with this fresh output
-   (`verification-before-completion`); a check that cannot run for an environment cause
-   is BLOCKED.
+1. Checks, run as `lado-checks` says. While you work, run any single test file you work
+   on. After a `red` from `verify`, rerun the failing checks its note quotes, also a
+   failing live test (`uv run pytest -m live -n0 <file>::<test> -k <provider>`; a Claude
+   run needs the human's yes through the supervisor). After your last change, once: `make
+   lint` (`make fmt` fixes most) and `make test`; each `test_*.py` you added or changed
+   under `tests/integration/` or `tests/ui/`; `make test-js` when
+   `src/lado/providers/opencode_plugin.js` or `tests/js/` changed; `make web` when `web/`
+   changed. When only BACKLOG.md, ROADMAP.md, README.md, AGENTS.md, CLAUDE.md or `docs/`
+   changed: `make lint` alone. Otherwise no live tests and no `make check`: the checker
+   runs them in `verify`. Claim done only with this fresh output
+   (`verification-before-completion`); an environment failure is BLOCKED.
 2. Commit on your branch before you report.
 3. Report at the end of your turn: in a run, the step's outcome with `flow_advance`
    (`note_summary`, `note_body`); outside a run, to the supervisor with `send_message`

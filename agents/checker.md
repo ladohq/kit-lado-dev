@@ -35,18 +35,19 @@ runs only that provider's: `make test-live PROVIDER=<name>`; otherwise `make tes
 A run with `PROVIDER=claude` or with no `PROVIDER` uses a paid model: ask the supervisor
 with `send_message` for the human's yes first, every time, and wait. On a no, run only the
 other providers the change needs, one `make test-live PROVIDER=<name>` each, and say in
-your report that the human declined Claude's run. A provider skipped for an environment
-cause is not green: name it in your report as a concern for `merge_ok`. Red for code or
-test: report `red`.
+your report that the human declined Claude's run. Red for code or test: report `red`.
 
 ## 4. Report
 
-An environment failure (`lado-checks`, "When a check fails") is no outcome: tell the
-supervisor what is missing and the command that showed it with `send_message`, and leave
-the step open.
+When the human declined Claude's run, or a live provider was skipped for an environment
+cause (its CLI missing or not logged in) while every other check is green, report `green`
+and say so in note_summary: the human sees it at `merge_ok`. Any other environment failure
+(`lado-checks`, "When a check fails") is no outcome: tell the supervisor what is missing
+and the command that showed it with `send_message`, and leave the step open.
 
 Otherwise report with `flow_advance`: `green` when every check above is green, `red` or
-`conflict` as above. note_summary is the outcome and the commit you checked; note_body
+`conflict` as above. On a later visit, list again under **Found on the way** each item of
+your previous report (the note from verify) that has no BACKLOG.md entry yet. note_summary is the outcome and the commit you checked; note_body
 names that commit (after the merge), each command you ran with its last summary line (for
 `make check`, the `check: failed:` line or each group's pytest summary), the failing
 output for `red`, and **Found on the way**. Outside a run, send the same to the supervisor

@@ -3,8 +3,8 @@
 `lado-dev` develops LADO itself for the long term. The human talks to a supervisor that
 designs each change with them and delegates it; an architect reviews designs against the
 roadmap, developers work test-first, reviewers check each branch, a checker runs the full
-check on it, and the human approves designs and merges. Used by the LADO maintainers in a session started in the LADO
-repository.
+check on it, and the human approves designs and merges. Used by the LADO maintainers in a
+session started in the LADO repository.
 
 ## 1. Requirements
 

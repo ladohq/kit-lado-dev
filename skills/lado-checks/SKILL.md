@@ -35,8 +35,9 @@ fails; at the end it prints `check: failed: <groups>` and exits non-zero. To rea
 CLIs and models, serially. They run only in `verify` (the checker's role says when) and at
 a release. A run with `PROVIDER=claude`, or with no `PROVIDER` (every provider, Claude
 included), uses a paid model: whoever runs it gets the human's yes first, through the
-supervisor, every time. Live tests are green only when each provider they need passed: a
-skipped provider is not green.
+supervisor, every time. Live tests are green only when each provider they need passed;
+a provider the human declined, or one skipped for an environment cause (its CLI missing or
+not logged in), is a concern the checker names in its `green` report for `merge_ok`.
 
 Never pipe a check whose result gates something (`make check | tail` hides a red exit
 status): write it to a log outside the tree (`make check > <log> 2>&1`; a log in the
@@ -66,7 +67,7 @@ branch and found the full check green) and the human's `merge_ok`. It runs no ch
    run's branch (a commit of BACKLOG.md alone needs no new check).
 2. In your repo, on main, `git merge --ff-only <the run's branch>`. If it fails because
    main moved since `verify`, report `stale`: the run goes back to `verify`, which merges
-   the new main and checks again.
+   the new main and checks again; after its `green` the human answers Merge? again.
 
 Done when each item found on the way has its entry and main is at the run's branch. Then
 report `merged`.

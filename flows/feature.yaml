@@ -58,7 +58,7 @@ states:
     outcomes: {approved: implement, rejected: design}
   implement:
     agent: developer
-    needs: [design, implement]
+    needs: [design, implement, verify]
     do: |
       Implement the design (the note from design, as the human approved it) in the run's
       worktree, test-first, as your role describes. The architect's review comes with the
