@@ -21,10 +21,24 @@ In the run's worktree, `git merge main`. If it conflicts, `git merge --abort` an
 ## 2. Full check
 
 Run `make check` (in a kit's own repository, `lado kits check .`, which is the whole check).
-If it is red, rerun it once before you classify, as `lado-checks`, "When a check fails",
-says. Green on the rerun: it was flaky; list it under **Found on the way** and go on. Red
-again: classify the second run's first error. Code or test: report `red`, with the failing
-output in the note.
+If it is red, do not rerun all of it: rerun only what failed, up to 2 times, before you
+classify (`lado-checks`, "When a check fails"):
+
+- A failed make target (`lint`, `test-js`, `web`, `browser`, seen in the log): that
+  target, `make <target>`. Make stops there, before the tests (no `check:` line): when
+  the target passes on a rerun, run `make check` once more.
+- Each pytest group of the `check: failed: <groups>` line: only the tests of its
+  `FAILED <node id>` summary lines, with the group's `-m` (unit none, integration
+  `-m integration`, ui `-m ui`) and `-n0`, e.g.
+  `uv run pytest -m integration -n0 'tests/integration/test_x.py::test_y'`.
+- A collection error, or a group that failed without `FAILED` lines (a crash, a
+  timeout): that group's whole command, once.
+- In a kit's own repository: `lado kits check .` again.
+
+A test that passes on a rerun is flaky: list it under **Found on the way** with its
+failing line and go on (with every other check green, the outcome stays `green`). One
+that fails all 3 times is code or test, classified on its first real error: report `red`,
+with the failing output in the note.
 
 ## 3. Live tests
 

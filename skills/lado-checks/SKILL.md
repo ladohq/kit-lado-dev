@@ -82,10 +82,11 @@ role says).
    - **code**: the product does the wrong thing. Fix the code.
    - **test**: the test expects the wrong thing or depends on order or timing. Fix the
      test and say why it was wrong.
-   - **flaky**: passes on rerun with no change. Rerun up to 2 times (the checker reruns
-     `make check` once). If it passes, report it as flaky with the failing line, and record
-     it in BACKLOG.md (the checker lists it under **Found on the way**). If it fails every
-     time, it is not flaky: treat it as code or test.
+   - **flaky**: passes on rerun with no change. Rerun only what failed, up to 2 times
+     (the checker: what to rerun after a red `make check` is in its role, section 2). If it
+     passes, report it as flaky with the failing line, and record it in BACKLOG.md (the
+     checker lists it under **Found on the way**). If it fails every time, it is not
+     flaky: treat it as code or test.
    - **environment**: tmux, node, uv, a CLI login, a network or disk problem. Report what is
      missing and the command that showed it; do not change code to work around it. The
      developer reports BLOCKED; the reviewer and the checker tell the supervisor and leave
