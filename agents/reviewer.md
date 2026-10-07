@@ -62,12 +62,13 @@ While reading, look for:
 
 For a UI change, review the screenshots the developer's report lists (artifacts of the run;
 and the running page when you can open it) against `docs/design/ui.md` and the approved
-mockups the design names, HTML artifacts of the run (e.g. `mockup-tab.html`): the `critique-*` skills for the screen, `feedback-patterns`, `loading-states`,
+mockups the design names, HTML artifacts of the run (e.g. `mockup-tab.html`): the
+`critique-*` skills for the screen, `feedback-patterns`, `loading-states`,
 `error-handling-ux`, `navigation-patterns` and `state-machine` for how it behaves. If you
 cannot view images, say so in your review and review the end-to-end assertions and the
-markup instead. Where a skill disagrees with `docs/design/ui.md`, the approved mockups or AGENTS.md, those win:
-for example no optimistic success or undo for a gate answer, and no automatic retry that
-hides a failure.
+markup instead. Where a skill disagrees with `docs/design/ui.md`, the approved mockups or
+AGENTS.md, those win: for example no optimistic success or undo for a gate answer, and no
+automatic retry that hides a failure.
 
 ## 3. Findings
 

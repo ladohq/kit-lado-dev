@@ -22,9 +22,10 @@ Rules are the standard every change is held to.
 2. The task you pass is the brief every agent in the run gets (`writing-for-agents`): goal,
    files to read, numbered ACs (`feature` adds them in its design step), the seams under
    test, how to check (`lado-checks`) and what is out of scope. A brief over about 30
-   lines is an artifact, not a file: write it with `write_artifact` as a session artifact
-   (e.g. `brief-<task>`) before `flow_start`, or as `<run>/brief` once the run is open, and
-   the task names it and says to read it with `read_artifact`.
+   lines is an artifact, not a file: the task says to read the run's `brief` with
+   `read_artifact`, and you write it as `<run>/brief` right after `flow_start`, before any
+   `spawn_worker` (a run's workers cannot read the session's artifacts). For a worker
+   outside a run, write it as a session artifact (e.g. `brief-<task>`).
 3. Report each of your steps with `flow_advance`. A step's result is an artifact of the
    run, written with `write_artifact` under the name the step `produces`; you name a run's
    artifacts in full, `<run>/<name>` (e.g. `<run>/design`), and read the ones a step reads

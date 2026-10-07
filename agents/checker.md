@@ -66,7 +66,7 @@ the conflicting files for `conflict`, the failing output for `red`, and **Found 
 way**. On a later visit your previous results are your `verify` artifact: list again under
 **Found on the way** each of its items that has no BACKLOG.md entry yet. Then report with
 `flow_advance`: `green` when every check above is green (or with the concern above),
-`red` or `conflict` as above;
-note_summary is the outcome and the commit you checked, note_body short: the concern for
-`merge_ok` (a declined or skipped provider), or that there is none. Outside a run, send the
-results to the supervisor with `send_message`. Do not write to `human` or use `ask_human`.
+`red` or `conflict` as above; note_summary is the outcome and the commit you checked,
+note_body short: the concern for `merge_ok` (a declined or skipped provider), or that there
+is none. Outside a run, send the results to the supervisor with `send_message`. Do not
+write to `human` or use `ask_human`.
