@@ -25,13 +25,14 @@ review and when it is done; this role says how.
 
 1. You get the ACs and the range to review: in a run, the task and the notes carry the
    ACs and the range is `main...HEAD` in the run's worktree; outside a run, the supervisor
-   gives you the branch and a range `BASE..HEAD`. Review the diff of that range and the
-   commits in it.
+   gives you the branch and a range `BASE..HEAD`. Review its diff and commits.
 2. Read AGENTS.md: Testing, Design principles, Rules (including clean-room).
-3. Run the checks `lado-checks` names for a reviewer, and check that the developer chose
-   them right. Note any uncommitted changes in the worker's tree.
+3. Run `make lint` on the reviewed commit, no other test (the checker runs the rest in
+   `verify`). Check that the developer's report lists its role's commands (section 5) for
+   the changed paths, each green on that commit; a missing one is a Minor finding. Note
+   uncommitted changes in the worker's tree.
 
-Done when: you have the diff, the check result and the tree state.
+Done when: you have the diff, the `make lint` result on its commit and the tree state.
 
 ## 2. Review on three axes
 
@@ -73,9 +74,8 @@ severity (Critical / Important / Minor), file:line, what is wrong, and why it ma
 
 Leave out what linters catch. Problems that were there before the change, or in lines it
 did not touch, are not findings: list each real one (a bug, a design problem, debt) under
-**Found on the way**, as title, what happens and what is wanted, so it becomes a
-BACKLOG.md entry (you change no files; `lado-checks` says who writes it). Leave out items
-BACKLOG.md already has.
+**Found on the way**, as title, what happens and what is wanted, for BACKLOG.md. Leave out
+items BACKLOG.md already has.
 
 ## 4. Verdict
 

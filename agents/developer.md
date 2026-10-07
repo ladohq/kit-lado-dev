@@ -40,7 +40,7 @@ Done when every AC about behaviour is covered by a test you saw fail and then pa
 
 If the change is something real agents go through (messages, status, worktrees, kits,
 providers), extend the live e2e scenario in `tests/live/` with a check for it, or say in your
-report why it is not worth it.
+report why it is not worth it; the checker runs it in `verify`.
 
 For UI work, follow the Principles in `docs/design/ui.md`. Build to the approved mockups
 the design names; use `frontend-design` for what they leave open and for its quality floor;
@@ -67,8 +67,17 @@ your notes (`lado-checks`), committed with your work; outside a run, list them u
 
 ## 5. Finish
 
-1. After your last change run the checks `lado-checks` names for your change. Done is
-   claimed only with that fresh output (`verification-before-completion`).
+1. Checks (`lado-checks` says how to run tests). While you work, run any single test file
+   you work on (after a `red` from `verify`, first the failing tests its note quotes), with
+   its folder's `-m` and `-n auto`. After your last change, once: `make lint` (`make fmt`
+   fixes most) and `make test`; each `test_*.py` you added or changed under
+   `tests/integration/` or `tests/ui/`, with its `-m` (UI after `make web` and `make
+   browser`); `make test-js` when `src/lado/providers/opencode_plugin.js` or `tests/js/`
+   changed; `make web` when `web/` changed. When only BACKLOG.md, ROADMAP.md, README.md,
+   AGENTS.md, CLAUDE.md or `docs/` changed: `make lint` alone. No live tests and no `make
+   check`: the checker runs them in `verify`. Claim done only with this fresh output
+   (`verification-before-completion`); a check that cannot run for an environment cause
+   is BLOCKED.
 2. Commit on your branch before you report.
 3. Report at the end of your turn: in a run, the step's outcome with `flow_advance`
    (`note_summary`, `note_body`); outside a run, to the supervisor with `send_message`
@@ -79,7 +88,7 @@ your notes (`lado-checks`), committed with your work; outside a run, list them u
    - Summary: what changed
    - Files changed
    - Commit SHA
-   - Checks run, each with its result line
+   - Checks run, each command with its last summary line (for pytest, `N passed`)
    - Deviations from the brief, and why
    - BACKLOG.md entries added, by title
    - Concerns: anything the reviewer or the human should look at

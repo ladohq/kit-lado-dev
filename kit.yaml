@@ -1,11 +1,11 @@
 name: lado-dev
-version: 0.10.3
+version: 0.11.0
 description: >-
   Develop LADO itself for the long term: a supervisor that designs with the human and
   delegates, an architect that reviews each design against the roadmap, developers that
-  work test-first, and reviewers that check each branch before it is merged; what anyone
-  finds outside the task goes to BACKLOG.md. The flows feature and fix take each task from
-  design to merge.
+  work test-first, reviewers that check each branch, and a checker that runs the full
+  check before the human approves the merge; what anyone finds outside the task goes to
+  BACKLOG.md. The flows feature and fix take each task from design to merge.
 supervisor: supervisor
 dependencies:
   lado: ">=0.19"

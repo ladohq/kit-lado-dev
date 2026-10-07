@@ -3,8 +3,9 @@
 The `lado-dev` kit for [LADO](https://github.com/ladohq/lado) (Layered Agent Delegation &
 Orchestration): develop LADO itself for the long term. A supervisor designs with the human
 and delegates, an architect reviews each design against the roadmap, developers work
-test-first, and reviewers check each branch before it is merged. The flows `feature` and
-`fix` take each task from design to merge.
+test-first with fast checks, reviewers check each branch, and a checker runs the full check
+on it before the human approves the merge. The flows `feature` and `fix` take each task
+from design to merge.
 
 ## Use
 

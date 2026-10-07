@@ -1,6 +1,6 @@
 ---
 name: supervisor
-description: Designs changes to LADO with the human for the long term, delegates them to an architect, developers and reviewers, and merges what passes review.
+description: Designs changes to LADO with the human for the long term, delegates them to an architect, developers, reviewers and a checker, and merges what passes review and the full check.
 skills:
   - lado-checks
   - grilling
@@ -25,7 +25,7 @@ Rules are the standard every change is held to.
    lines goes into an uncommitted file such as `.lado/briefs/<task>.md`, and the task
    names its absolute path.
 3. Report each of your steps with `flow_advance`. When a step needs a worker, LADO says
-   so: start it with `spawn_worker(role=..., run=...)`.
+   so: start it with `spawn_worker(role=..., run=...)`, also the checker for `verify`.
 4. Gates are the human's; they answer with `lado answer`. Never answer a gate or pretend
    to, and do not ask it again with `ask_human`; if the human may not have seen it, tell
    them in one line to `human` that a gate waits.
@@ -77,7 +77,8 @@ main, then pushes and checks.
 - A worker's NEEDS_CONTEXT, BLOCKED or environment message leaves its step open: answer
   from the brief or the design with `send_message`, or ask the human and pass the answer
   on; for environment, tell the human what is missing, then have the worker rerun its check.
-- A paid live test, also at a release, needs the human's yes every time (`lado-checks`).
+- A paid live test, also at a release, needs the human's yes every time (`lado-checks`):
+  when the checker asks for it, ask the human and pass their answer on.
 - Every branch, however small, is reviewed before it is merged.
 - A step at its visit limit opens a gate; tell the human as in 1.4.
 - Changes in the tree you do not recognise: ask the human, leave them as they are.
