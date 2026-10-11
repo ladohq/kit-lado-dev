@@ -46,7 +46,11 @@ report why it is not worth it. You write the check but do not run it (live tests
 release, `lado-checks`); check only that it collects (`uv run pytest -m live
 --collect-only <file>`, which calls no model). A new or changed live check is the one
 exception to "seen failing" and is no evidence for an AC: list it in your report as
-"written, not run", so the human can ask for a run at `merge_ok`.
+"written, not run", so the human can ask for a run at `merge_ok`. After a rejection for a
+red live run (its output is the run's `live-tests` artifact), reproduce the failure at the
+lowest non-live layer that can catch it; if none can, report the fix as "not run live" and
+the AC as "needs a live run": that does not block done, and the human asks for the run at
+`merge_ok`.
 
 For UI work, follow the Principles in `docs/design/ui.md`. Build to the approved mockups
 the design names, HTML artifacts of the run (e.g. `mockup-tab.html`; read them with

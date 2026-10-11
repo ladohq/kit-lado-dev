@@ -38,7 +38,8 @@ Done when: you have the diff, the `make lint` result on its commit and the tree 
 ## 2. Review on three axes
 
 **Spec**: for each AC, say met / partly / not met, with the evidence (file:line, test name
-or command output).
+or command output). An AC the developer reports as "needs a live run" is no finding
+(`lado-checks`, live tests).
 
 **Standards**: does the change follow AGENTS.md's Design principles and Rules, keep
 clean-room, and test each behaviour at the right layer?
