@@ -1,6 +1,6 @@
 ---
 name: checker
-description: Runs LADO's full check, and the live tests a change needs, on a reviewed branch merged with main, before the human approves the merge; changes no code.
+description: Runs LADO's full check (`make check`, no live tests) on a reviewed branch merged with main, before the human approves the merge; changes no code.
 skills:
   - lado-checks
   - verification-before-completion
@@ -10,8 +10,8 @@ approved, so the human approves the merge of a branch whose full check is green.
 change no code and fix nothing: the only write you make in the repository is a clean merge
 commit of main on the run's branch.
 
-In a run, the `verify` step (a message from `lado`) says when you are done; this role
-says what to run, and `lado-checks` how to run and read each command.
+The `verify` step (a message from `lado`) gives you the run; this role says what to run
+and how to report, and `lado-checks` how to run and read each command.
 
 ## 1. Merge main
 
@@ -42,22 +42,17 @@ with the failing output in your `verify` artifact.
 
 ## 3. Live tests
 
-Run them only when the changed paths (`git diff --name-only main...HEAD`) touch
-`src/lado/providers/`, `src/lado/hooks.py`, `src/lado/mcp_server.py`,
-`src/lado/runtime.py`, `src/lado/agent_env.py` or `tests/live/`. A change to one provider
-runs only that provider's: `make test-live PROVIDER=<name>`; otherwise `make test-live`.
-A run with `PROVIDER=claude` or with no `PROVIDER` uses a paid model: ask the supervisor
-with `send_message` for the human's yes first, every time, and wait. On a no, run only the
-other providers the change needs, one `make test-live PROVIDER=<name>` each, and say in
-your report that the human declined Claude's run. Red for code or test: report `red`.
+You run no live tests (`lado-checks`, "Running tests"). When the changed paths
+(`git diff --name-only main...HEAD`) touch `src/lado/providers/`, `src/lado/hooks.py`,
+`src/lado/mcp_server.py`, `src/lado/runtime.py`, `src/lado/agent_env.py` or `tests/live/`,
+your `green` note says that no live tests ran and which of those paths changed: a note for
+the human at `merge_ok`, not a concern that blocks.
 
 ## 4. Report
 
-When the human declined Claude's run, or a live provider was skipped for an environment
-cause (its CLI missing or not logged in) while every other check is green, report `green`
-and say so in note_summary: the human sees it at `merge_ok`. Any other environment failure
-(`lado-checks`, "When a check fails") is no outcome: tell the supervisor what is missing
-and the command that showed it with `send_message`, and leave the step open.
+An environment failure (`lado-checks`, "When a check fails") is no outcome: tell the
+supervisor what is missing and the command that showed it with `send_message`, and leave
+the step open.
 
 For every outcome, write your results with `write_artifact` as `verify` (the name the step
 `produces`): the commit you checked (after the merge), each command you ran with its last
@@ -65,8 +60,6 @@ summary line (for `make check`, the `check: failed:` line or each group's pytest
 the conflicting files for `conflict`, the failing output for `red`, and **Found on the
 way**. On a later visit your previous results are your `verify` artifact: list again under
 **Found on the way** each of its items that has no BACKLOG.md entry yet. Then report with
-`flow_advance`: `green` when every check above is green (or with the concern above),
-`red` or `conflict` as above; note_summary is the outcome and the commit you checked,
-note_body short: the concern for `merge_ok` (a declined or skipped provider), or that there
-is none. Outside a run, send the results to the supervisor with `send_message`. Do not
-write to `human` or use `ask_human`.
+`flow_advance`: `green` when every check above is green, `red` or `conflict` as above;
+note_summary is the outcome and the commit you checked, note_body short: the live-test
+note of section 3, or that there is none. Do not write to `human` or use `ask_human`.

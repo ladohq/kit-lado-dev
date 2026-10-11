@@ -62,12 +62,12 @@ states:
     outcomes: {approved: design_ok, changes: design}
   design_ok:
     gate: approval
-    reads: [design]
+    reads: [design, architecture-review]
     ask: Approve the design?
     outcomes: {approved: implement, rejected: design}
   implement:
     agent: developer
-    reads: [design, verify]
+    reads: [design, architecture-review, review, verify]
     produces: [report]
     do: |
       Implement the design (your `design` input, as the human approved it; read it with
@@ -86,9 +86,7 @@ states:
       checks your role (section 5) names are green, the work is committed on the run's
       branch and your full report (your role, section 5) is written with `write_artifact`
       as `report`, starting with every AC, written out in full, with its status and the
-      test or command that shows it. Report `done`: note_summary is your status and a
-      one-line result; note_body is short: what changed since the last visit, your
-      concerns and questions for the human, or that there are none.
+      test or command that shows it. Report `done` as your role, section 5, says.
     outcomes: {done: review}
   review:
     agent: reviewer
@@ -111,13 +109,14 @@ states:
     agent: checker
     produces: [verify]
     do: |
-      Check the branch as your role describes, and write the commit you checked, each
-      command with its result and **Found on the way** with `write_artifact` as `verify`.
-      On a later visit your previous results are your `verify` artifact.
+      Check the branch as your role describes. On a later visit your previous results are
+      your `verify` artifact.
+      Done when your `verify` artifact is written; report `green`, `red` or `conflict` as
+      your role, section 4, says.
     outcomes: {green: merge_ok, red: implement, conflict: implement}
   merge_ok:
     gate: approval
-    reads: [report, verify]
+    reads: [report, review, verify]
     ask: Merge?
     outcomes: {approved: merge, rejected: implement}
   merge:

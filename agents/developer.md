@@ -42,7 +42,7 @@ Done when every AC about behaviour is covered by a test you saw fail and then pa
 
 If the change is something real agents go through (messages, status, worktrees, kits,
 providers), extend the live e2e scenario in `tests/live/` with a check for it, or say in your
-report why it is not worth it; the checker runs it in `verify`.
+report why it is not worth it; you write the check, the live tests run at a release.
 
 For UI work, follow the Principles in `docs/design/ui.md`. Build to the approved mockups
 the design names, HTML artifacts of the run (e.g. `mockup-tab.html`; read them with
@@ -67,29 +67,26 @@ After three failed fix attempts, stop and report BLOCKED with what each attempt 
 A bug, an architectural problem or debt outside your task is neither fixed out of scope
 nor left unsaid: add a BACKLOG.md entry for it and for each **Found on the way** item in
 what your step reads (the design, a review, the checker's results; `lado-checks`),
-committed with your work; outside a run, list them under
-**Found on the way** in your report: the supervisor records them.
+committed with your work.
 
 ## 5. Finish
 
 1. Checks, run as `lado-checks` says. While you work, run any single test file you work
-   on. After a `red` from `verify`, rerun the failing checks its `verify` artifact quotes,
-   also a failing live test (`uv run pytest -m live -n0 <file>::<test> -k <provider>`; a
-   Claude run needs the human's yes through the supervisor). After your last change, once: `make
+   on. After a `red` from `verify`, rerun the failing checks its `verify` artifact quotes.
+   After your last change, once: `make
    lint` (`make fmt` fixes most) and `make test`; each `test_*.py` you added or changed
    under `tests/integration/` or `tests/ui/`; `make test-js` when
    `src/lado/providers/opencode_plugin.js` or `tests/js/` changed; `make web` when `web/`
    changed. When only BACKLOG.md, ROADMAP.md, README.md, AGENTS.md, CLAUDE.md or `docs/`
    changed: `make lint` alone. Otherwise no live tests and no `make check`: the checker
-   runs them in `verify`. Claim done only with this fresh output
+   runs `make check` in `verify`. Claim done only with this fresh output
    (`verification-before-completion`); an environment failure is BLOCKED.
 2. Commit on your branch before you report.
-3. Report at the end of your turn. In a run, write the full report with `write_artifact`
-   as `report` (the name the step `produces`), then report the step's outcome with
-   `flow_advance`: `note_summary` is the status and a one-line result, `note_body` short
-   (what changed since the last visit, your concerns and questions for the human, or that
-   there are none). Outside a run, send it to the supervisor with `send_message`: the
-   summary is the status and a one-line result, the body the full report.
+3. Report at the end of your turn. Write the full report with `write_artifact` as
+   `report` (the name the step `produces`), then report `done` with `flow_advance`:
+   `note_summary` is the status and a one-line result, `note_body` short (what changed
+   since the last visit, your concerns and questions for the human, or that there are
+   none).
    Status is one of DONE | DONE_WITH_CONCERNS | NEEDS_CONTEXT | BLOCKED. NEEDS_CONTEXT and
    BLOCKED do not finish a step: send them to the supervisor with `send_message` and leave
    the run where it is. The full report holds:
@@ -106,7 +103,7 @@ committed with your work; outside a run, list them under
 Follow `receiving-code-review`. Check each finding against the code before acting on it;
 dispute a wrong one with the reason and evidence. Fix the valid ones one at a time,
 re-running the relevant test after each, then finish as in 5. The summary says how many
-findings you fixed and disputed; the full report (in a run, your `report` artifact) is as
+findings you fixed and disputed; the full report (your `report` artifact) is as
 in 5, then each finding with what you did or why you dispute it.
 
 ## Working rules

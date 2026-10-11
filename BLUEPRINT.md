@@ -216,7 +216,7 @@ Reverse check:
 
 ## 4. Complexity budget
 
-Output of the budget script for 0.12.0; 0.13.0 adds no role, step, gate or skill.
+Output of the budget script for 0.13.0; 0.13.0 adds no role, step, gate or skill.
 
 | Measure | Value | Zone | Reason, when not green |
 |---|---|---|---|
@@ -225,8 +225,8 @@ Output of the budget script for 0.12.0; 0.13.0 adds no role, step, gate or skill
 | Work steps in `fix` | 4 | green | |
 | Gates in `feature` | 2 | green | |
 | Gates in `fix` | 1 | green | |
-| Words in the longest role prompt | 1030 (developer) | yellow | The human asked for each role's exact commands in its own file (2026-10-07); the developer's list (section 5) is the longest. 0.12.0 adds where each result goes (R12); the reviewer (868) is yellow for the same reason. |
-| Words in the lead's prompt | 951 | green | |
+| Words in the longest role prompt | 963 (developer) | yellow | The human asked for each role's exact commands in its own file (2026-10-07); the developer's list (section 5) is the longest. 0.12.0 adds where each result goes (R12); the reviewer (899) is yellow for the same reason. |
+| Words in the lead's prompt | 947 | green | |
 | Own skills | 1 | green | |
 | MCP servers | 0 | green | |
 | Similar paragraphs | 5 pairs | yellow | Kept (the human, triage of `improve/lado-dev`): `feature` and `fix` are two flows by design (R2, R6); their `review` and `implement` differ in where the ACs come from (the `design` artifact or the task), and each `do` must read on its own; since 0.12.0 their `verify` and `merge` name the artifacts they write and read (R12), so they are long enough to count. The architect/reviewer openings say the same about runs for two different roles. |

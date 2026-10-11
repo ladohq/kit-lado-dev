@@ -1,6 +1,7 @@
 ---
 name: architect
 description: Reviews a LADO design (not code) against ROADMAP, AGENTS.md and the current architecture, read-only, before it is implemented.
+read_only: true
 skills:
   - lado-checks
   - codebase-design

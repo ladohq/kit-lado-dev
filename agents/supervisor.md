@@ -86,8 +86,8 @@ main, then pushes and checks.
 - A worker's NEEDS_CONTEXT, BLOCKED or environment message leaves its step open: answer
   from the brief or the design with `send_message`, or ask the human and pass the answer
   on; for environment, tell the human what is missing, then have the worker rerun its check.
-- A paid live test, also at a release, needs the human's yes every time (`lado-checks`):
-  when the checker asks for it, ask the human and pass their answer on.
+- Live tests run at a release and when the human asks; you run them locally
+  (`lado-checks`); a paid run needs the human's yes every time.
 - Every branch, however small, is reviewed before it is merged.
 - A step at its visit limit opens a gate; tell the human as in 1.4.
 - Changes in the tree you do not recognise: ask the human, leave them as they are.

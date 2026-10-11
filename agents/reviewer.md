@@ -1,6 +1,7 @@
 ---
 name: reviewer
 description: Reviews one LADO branch against its acceptance criteria, AGENTS.md and the long-term architecture, read-only, and gives a merge verdict.
+read_only: true
 skills:
   - lado-checks
   - critique-affordance
@@ -29,10 +30,12 @@ review and when it is done; this role says how.
    `main...HEAD` in the run's worktree; outside a run, the supervisor
    gives you the branch and a range `BASE..HEAD`. Review its diff and commits.
 2. Read AGENTS.md: Testing, Design principles, Rules (including clean-room).
-3. Run `make lint` on the reviewed commit, no other test (the checker runs the rest in
-   `verify`). Check that the developer's report lists its role's commands (section 5) for
-   the changed paths, each green on that commit; a missing one is a Minor finding. Note
-   uncommitted changes in the worker's tree.
+3. Run `make lint` on the reviewed commit, no other test (the checker runs `make check` in
+   `verify`). Check that the developer's report lists, each green on that commit, the
+   commands the developer runs for the changed paths: the test files it worked on,
+   `make lint`, `make test`, each integration/UI test file it changed, `make test-js` and
+   `make web` when their paths changed; for docs-only changes `make lint` alone. A
+   missing one is a Minor finding. Note uncommitted changes in the worker's tree.
 
 Done when: you have the diff, the `make lint` result on its commit and the tree state.
 

@@ -12,20 +12,21 @@ yourself after your last change; quote it in your step's artifact (the name the 
 Checks are slow (the whole unit suite takes about 4 minutes), so each role runs a fixed
 list of commands, written in its own file: the developer the fast ones, the reviewer
 `make lint`, and the checker, in the `verify` step before `merge_ok`, `make check` on the
-branch merged with main and the live tests the change needs. The role's list is the whole
-proof of its claims: "partial proves nothing" (`verification-before-completion`) means no
-fewer than the list names, not more. In a kit's own repository (e.g. kit-lado-dev) there is
+branch merged with main. The role's list is the whole proof of its claims: "partial proves
+nothing" (`verification-before-completion`) means no fewer than the list names, not more. In a kit's own repository (e.g. kit-lado-dev) there is
 no Makefile: `lado kits check .` is the whole check, for every role.
 
 ## Running tests
 
-`pyproject.toml` sets `addopts = -m 'not integration and not live and not ui'`, so a test
-file runs with its folder's `-m`: `tests/` none, `tests/integration/` `-m integration`,
-`tests/ui/` `-m ui` (after `make web` and `make browser`). An integration or UI file run
-without its `-m` is silently dropped: a `0 passed` or `no tests ran` line proves nothing,
-and in a mixed run `N passed` hides the dropped files. Run each layer as its own command,
-and add `-n auto` to every unit, integration and UI pytest command: the Makefile passes it,
-and without it pytest runs one test at a time (minutes instead of seconds).
+`pyproject.toml` sets `addopts = -m 'not integration and not live and not smoke and not ui'`,
+so a test file runs with its folder's `-m`: `tests/` none, `tests/integration/`
+`-m integration`, `tests/ui/` `-m ui` (after `make web` and `make browser`),
+`tests/smoke/` `-m smoke`. An integration or UI file run without its `-m` is silently
+dropped: a `0 passed` or `no tests ran` line proves nothing, and in a mixed run `N passed`
+hides the dropped files. Run each layer as its own command,
+and add `-n auto` to every unit, integration and UI pytest command that runs a suite or
+whole files: the Makefile passes it, and without it pytest runs one test at a time
+(minutes instead of seconds). A rerun of single node ids (`file::test`) uses `-n0`.
 
 `make check` runs `make lint`, `make test-js`, `make web` and `make browser`, then three
 pytest runs one after another: unit, `-m integration`, `-m ui`. All three run even when one
@@ -33,12 +34,10 @@ fails; at the end it prints `check: failed: <groups>` and exits non-zero. To rea
 `make check`, find the `check: failed:` line, then each failed group's own pytest summary.
 
 **Live tests** (`-m live`: `make test-live`, anything under `tests/live/`) drive real agent
-CLIs and models, serially. They run only in `verify` (the checker's role says when) and at
-a release. A run with `PROVIDER=claude`, or with no `PROVIDER` (every provider, Claude
-included), uses a paid model: whoever runs it gets the human's yes first, through the
-supervisor, every time. Live tests are green only when each provider they need passed;
-a provider the human declined, or one skipped for an environment cause (its CLI missing or
-not logged in), is a concern the checker names in its `green` report for `merge_ok`.
+CLIs and models, serially. They run only at a release ("Releasing LADO") or when the human
+asks for them; then the supervisor runs them locally. No role runs them in a run. A run
+with `PROVIDER=claude`, or with no `PROVIDER` (every provider, Claude included), uses a
+paid model and needs the human's yes first, every time.
 
 Never pipe a check whose result gates something (`make check | tail` hides a red exit
 status): write it to a log outside the tree (`make check > <log> 2>&1`; a log in the
@@ -47,16 +46,24 @@ Never start a second long check while one runs; wait for its result.
 
 ## Releasing LADO
 
-The supervisor, only when the human asks. The request allows one direct commit on main,
-the version bump (`uv version <X.Y.Z>`, commit). Then, in this order: push main; wait for
-green CI on that commit (CI runs everything `make check` runs, so no separate `make
-check`); the live tests of every provider (`make test-live`); push the tag `vX.Y.Z`, which
-publishes to PyPI. The tag needs green CI and green live tests on that commit. When the
-human declines Claude's run, run every other provider, one `make test-live
-PROVIDER=<name>` each; they must be green, and the human decides whether to release. Red
-CI or live tests: no tag; tell the human, quoting the failing line; the fix goes through
-`fix`, then the release goes on from pushing main with the same version. Each push needs
-the human's yes.
+The supervisor, only when the human asks, in the order of LADO's AGENTS.md ("Release"):
+
+1. `uv version <X.Y.Z>`, and the release date in place of "(unreleased)" in CHANGELOG.md:
+   one commit on main, the only direct commit the request allows.
+2. Push main, with the human's yes. That yes also covers starting the Windows probe in 4.
+3. CI green on that commit, the smoke on Linux and macOS with it (CI runs everything
+   `make check` runs, so no separate `make check`).
+4. The Windows probe green: `gh workflow run windows-shell.yml --ref main -f
+   runner=windows-latest`, then `gh run watch <id> --exit-status`.
+5. `make test-live` locally for every provider, Claude with the human's yes; rerun a
+   failure as "When a check fails" says for flaky. When the human declines Claude's run,
+   run every other provider, one `make test-live PROVIDER=<name>` each; they must be green,
+   and the human decides whether to release. A provider skipped for an environment cause
+   (its CLI missing or not logged in) is not green: tell the human.
+6. Push the tag `vX.Y.Z`, with the human's yes; it publishes to PyPI.
+
+Red CI, probe or live tests: no tag; tell the human, quoting the failing line. The fix goes
+through `fix`, then the release goes on from step 2 with the same version.
 
 ## Merging a run's branch
 
@@ -69,7 +76,10 @@ branch and found the full check green) and the human's `merge_ok`. It runs no ch
    run's branch (a commit of BACKLOG.md alone needs no new check).
 2. In your repo, on main, `git merge --ff-only <the run's branch>`. If it fails because
    main moved since `verify`, report `stale`: the run goes back to `verify`, which merges
-   the new main and checks again; after its `green` the human answers Merge? again.
+   the new main and checks again; after its `green` the human answers Merge? again. Any
+   other failure (local changes, another branch checked out, …) is no outcome: show the
+   human the command and its output, and retry once they say it is settled. Never stash or
+   reset their checkout.
 
 Done when each item found on the way has its entry and main is at the run's branch. Then
 report `merged`.
@@ -120,7 +130,7 @@ BACKLOG.md with `merge=union`, so entries that parallel branches add merge witho
 conflict. Mention the new entry in your report.
 
 Who writes the entry: the next agent that writes on the run's branch. In a flow run the
-design and the read-only roles (architect, reviewer, checker) list what they found under
+design, the read-only architect and reviewer, and the checker list what they found under
 **Found on the way** in their step's artifact (`design`, `architecture-review`, `review`,
 `verify`), each item as title, what happens, what is wanted. The design carries
 its own and the architect's items to the developer, who adds the entries in `implement`,
