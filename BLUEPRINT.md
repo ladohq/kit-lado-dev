@@ -226,7 +226,7 @@ Output of the budget script for 0.13.0; 0.13.0 adds no role, step, gate or skill
 | Work steps in `fix` | 4 | green | |
 | Gates in `feature` | 2 | green | |
 | Gates in `fix` | 1 | green | |
-| Words in the longest role prompt | 1023 (developer) | yellow | The human asked for each role's exact commands in its own file (2026-10-07); the developer's list (section 5) is the longest. 0.12.0 adds where each result goes (R12); the reviewer (907) is yellow for the same reason. |
+| Words in the longest role prompt | 1018 (developer) | yellow | The human asked for each role's exact commands in its own file (2026-10-07); the developer's list (section 5) is the longest. 0.12.0 adds where each result goes (R12); the reviewer (841) is yellow for the same reason. |
 | Words in the lead's prompt | 947 | green | |
 | Own skills | 1 | green | |
 | MCP servers | 0 | green | |

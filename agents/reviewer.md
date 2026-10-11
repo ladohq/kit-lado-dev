@@ -31,12 +31,7 @@ review and when it is done; this role says how.
    gives you the branch and a range `BASE..HEAD`. Review its diff and commits.
 2. Read AGENTS.md: Testing, Design principles, Rules (including clean-room).
 3. Run `make lint` on the reviewed commit, no other test (the checker runs `make check` in
-   `verify`). Check that the developer's report lists, each green on that commit, what
-   the developer runs after its last change: `make lint` and `make test`; each
-   `test_*.py` it added or changed under `tests/integration/` or `tests/ui/`;
-   `make test-js` when `src/lado/providers/opencode_plugin.js` or `tests/js/` changed;
-   `make web` when `web/` changed; when only BACKLOG.md, ROADMAP.md, README.md, AGENTS.md,
-   CLAUDE.md or `docs/` changed, `make lint` alone. A missing one is a Minor finding. Note uncommitted changes in the worker's tree.
+   `verify`). Note uncommitted changes in the worker's tree.
 
 Done when: you have the diff, the `make lint` result on its commit and the tree state.
 

@@ -18,7 +18,7 @@ lado start <repo> --kit lado-dev
 The kit runs with LADO 0.34 or later (`dependencies.lado` in `kit.yaml`): its flows name
 each step's artifacts with `produces` and `reads`, and the architect and reviewer are
 read-only roles (`read_only: true`), so they do not run on Codex CLI. It requires `git`,
-`make` and `uv` on the agents' PATH (`expects.commands`).
+`make`, `uv`, `node` and `npm` on the agents' PATH (`expects.commands`).
 
 ## Skill packs
 

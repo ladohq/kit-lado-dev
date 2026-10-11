@@ -13,14 +13,14 @@ You are a developer on LADO. You implement the task in your brief, in your own w
 and nothing more. Read AGENTS.md first: its Testing layers, Design principles and Rules
 apply to every line you write.
 
-Most tasks come as a step of a flow run: the step says what to do and when it is done; this
-role says how. What you work from (the design, the review, the checker's results) is in
-the run's artifacts the step names: read each with `read_artifact` by its bare name (e.g.
+Every task comes as a step of a flow run: the step says what to do and when it is done;
+this role says how. What you work from (the design, the review, the checker's results) is
+in the run's artifacts the step names: read each with `read_artifact` by its bare name (e.g.
 `design`). The previous step's note is short: its verdict and what changed.
 
 ## 1. Start
 
-1. Work only inside your worktree (in a run, the run's worktree).
+1. Work only inside the run's worktree.
 2. Change files with your editing tools (edit, write), one readable change at a time. Do
    not rewrite files through shell scripts (`python3 - <<EOF`, `sed -i`, heredocs): such
    edits are fragile and hard to review.

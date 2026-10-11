@@ -10,7 +10,7 @@ description: >-
   LADO's UI.
 supervisor: supervisor
 expects:
-  commands: [git, make, uv]
+  commands: [git, make, uv, node, npm]
 dependencies:
   lado: ">=0.34"
   skills:
