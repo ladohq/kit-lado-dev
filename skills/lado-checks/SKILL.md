@@ -35,9 +35,18 @@ fails; at the end it prints `check: failed: <groups>` and exits non-zero. To rea
 
 **Live tests** (`-m live`: `make test-live`, anything under `tests/live/`) drive real agent
 CLIs and models, serially. They run only at a release ("Releasing LADO") or when the human
-asks for them; then the supervisor runs them locally. No role runs them in a run. A run
-with `PROVIDER=claude`, or with no `PROVIDER` (every provider, Claude included), uses a
-paid model and needs the human's yes first, every time.
+asks for them, and only the supervisor runs them, locally; no worker does. In this kit's
+runs this replaces AGENTS.md's "and a provider's after changing it" (the human,
+2026-10-10), so a change merged without a live run is no finding. A run with
+`PROVIDER=claude`, or with no `PROVIDER` (every provider, Claude included), uses a paid
+model and needs the human's yes first, every time.
+
+When the human asks for them during a run (most likely at `merge_ok`, after the checker's
+note that no live tests ran): run them in the run's worktree (`flow_status`) at the commit
+`verify` checked, never while a check runs there. Write the output as an artifact of the
+run (`<run>/live-tests`) and tell the human the command and its last summary line, or the
+first failing line. A red result is no outcome of yours: the human decides, e.g. rejects
+the merge at `merge_ok` quoting that line, which sends it to `implement`.
 
 Never pipe a check whose result gates something (`make check | tail` hides a red exit
 status): write it to a log outside the tree (`make check > <log> 2>&1`; a log in the
@@ -50,20 +59,31 @@ The supervisor, only when the human asks, in the order of LADO's AGENTS.md ("Rel
 
 1. `uv version <X.Y.Z>`, and the release date in place of "(unreleased)" in CHANGELOG.md:
    one commit on main, the only direct commit the request allows.
-2. Push main, with the human's yes. That yes also covers starting the Windows probe in 4.
+2. Check `gh auth status` (step 4 needs it; if it fails, tell the human), then push main
+   with the human's yes. That yes also covers starting the Windows probe in 4. The commit
+   you push is the release commit: step 1's, or after a fix, main with the fix merged.
 3. CI green on that commit, the smoke on Linux and macOS with it (CI runs everything
    `make check` runs, so no separate `make check`).
 4. The Windows probe green: `gh workflow run windows-shell.yml --ref main -f
    runner=windows-latest`, then `gh run watch <id> --exit-status`.
-5. `make test-live` locally for every provider, Claude with the human's yes; rerun a
+5. `make test-live` locally, on main at the release commit, for every provider, Claude
+   with the human's yes; rerun a
    failure as "When a check fails" says for flaky. When the human declines Claude's run,
    run every other provider, one `make test-live PROVIDER=<name>` each; they must be green,
    and the human decides whether to release. A provider skipped for an environment cause
    (its CLI missing or not logged in) is not green: tell the human.
-6. Push the tag `vX.Y.Z`, with the human's yes; it publishes to PyPI.
+6. Tag the release commit (`git tag vX.Y.Z <the release commit>`) and push the tag, with
+   the human's yes; it publishes to PyPI.
 
-Red CI, probe or live tests: no tag; tell the human, quoting the failing line. The fix goes
-through `fix`, then the release goes on from step 2 with the same version.
+Red CI, probe or live tests: no tag. Classify the failure first ("When a check fails"):
+for environment or flaky, tell the human and rerun once (a workflow with `gh run rerun
+<id> --failed`); for code or test, tell the human, quoting the failing line. The fix goes
+through `fix`; its CHANGELOG.md line goes under the dated `## X.Y.Z`, and it updates the
+date if the day changed. The release goes on from step 2 with the same version. A
+BACKLOG.md entry found during a release (a flaky test) is committed on main after the tag
+is pushed, so main does not move past the release commit.
+
+Done when the tag is pushed, or the human chose to stop and you told them what is left.
 
 ## Merging a run's branch
 

@@ -42,7 +42,11 @@ Done when every AC about behaviour is covered by a test you saw fail and then pa
 
 If the change is something real agents go through (messages, status, worktrees, kits,
 providers), extend the live e2e scenario in `tests/live/` with a check for it, or say in your
-report why it is not worth it; you write the check, the live tests run at a release.
+report why it is not worth it. You write the check but do not run it (live tests run at a
+release, `lado-checks`); check only that it collects (`uv run pytest -m live
+--collect-only <file>`, which calls no model). A new or changed live check is the one
+exception to "seen failing" and is no evidence for an AC: list it in your report as
+"written, not run", so the human can ask for a run at `merge_ok`.
 
 For UI work, follow the Principles in `docs/design/ui.md`. Build to the approved mockups
 the design names, HTML artifacts of the run (e.g. `mockup-tab.html`; read them with
